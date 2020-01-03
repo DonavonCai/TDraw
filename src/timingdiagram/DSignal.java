@@ -2,6 +2,7 @@ package timingdiagram;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -10,28 +11,31 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
-//import javafx.scene.shape.Line;
+import javafx.scene.input.MouseEvent;
+import javafx.event.EventHandler;
 
-public class DSignal { // TODO: get coordinates on mouse click
-    private int coord;
+class DSignal { // TODO: handle mouse events
+    private int height;
+    private int canvas_width;
 
-    public DSignal() {
-        coord = 0;
+    DSignal() {
+        height = 45;
+        canvas_width = 500;
         System.out.println("Signal created!");
     }
-    public HBox draw() {
+    HBox draw() {
         // System.out.println("drawing");
         Button delete_signal = new Button("X");
         TextField name = new TextField("Signal_Name");
 
-        Canvas signal = new Canvas(500, 50);
+        Canvas signal = new Canvas(canvas_width, height);
         GraphicsContext gc = signal.getGraphicsContext2D();
 
         // style the pane instead of the canvas
         Pane signalPane = new Pane(signal);
-        signalPane.setPrefSize(500,50);
+        signalPane.setPrefSize(canvas_width, height);
 
-//         use to test pane sizing
+        // use to test pane sizing
 //        signalPane.setStyle("-fx-padding: 10;" +
 //                "-fx-border-style: solid inside;" +
 //                "-fx-border-width: 2;" +
@@ -49,17 +53,27 @@ public class DSignal { // TODO: get coordinates on mouse click
         diagram.setSpacing(5);
         diagram.setAlignment(Pos.BOTTOM_CENTER);
 
+        signalPane.addEventHandler(MouseEvent.MOUSE_PRESSED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent e) {
+                        System.out.println("press at " + e.getX());
+                        draw_vertical(gc);
+                    };
+                }
+        );
+
         return diagram;
     }
 
     private void init_line(GraphicsContext g) {
         g.beginPath();
-        g.moveTo(0,50);
-        g.lineTo(600,50);
+        g.moveTo(0, height);
+        g.lineTo(canvas_width, height);
         g.stroke();
     }
 
-    public int getCoord() {
-        return coord;
+    private void draw_vertical(GraphicsContext g) {
+
     }
 }

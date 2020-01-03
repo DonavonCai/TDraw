@@ -32,7 +32,6 @@ public class TDraw extends Application {
         };
         add_signal_button.setOnAction(add_signal);
 
-        // TODO: find a layout for this
         DSignal initial_signal = new DSignal();
         Group root = new Group();
         HBox buttons = new HBox(add_signal_button);
@@ -46,5 +45,4 @@ public class TDraw extends Application {
         Scene diagram = new Scene(root, 800, 400);
         primaryStage.setScene(diagram);
     }
-
 }
