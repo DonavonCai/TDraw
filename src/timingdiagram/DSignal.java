@@ -12,15 +12,28 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.MouseButton;
 import javafx.event.EventHandler;
+
+import java.util.HashMap;
+import java.util.ArrayList;
 
 class DSignal { // TODO: handle mouse events
     private int height;
     private int canvas_width;
+    private int num_edges;
+
+    // key <= numbered edge from left to right. The first edge is numbered 0.
+    // value <= 0 for negative, 1 for positive
+    private HashMap<Integer, Boolean> edge_type;
+    private HashMap<Integer, Integer> edge_coords;
 
     DSignal() {
-        height = 45;
+        height = 30;
         canvas_width = 500;
+        num_edges = 0;
+        edge_type = new HashMap<Integer, Boolean>();
+        edge_coords = new HashMap<Integer, Integer>();
         System.out.println("Signal created!");
     }
     HBox draw() {
@@ -56,10 +69,30 @@ class DSignal { // TODO: handle mouse events
         signalPane.addEventHandler(MouseEvent.MOUSE_PRESSED,
                 new EventHandler<MouseEvent>() {
                     @Override
-                    public void handle(MouseEvent e) {
-                        System.out.println("press at " + e.getX());
-                        draw_vertical(gc);
-                    };
+                    public void handle(MouseEvent event) { // code is repeated to avoid event handling with mouse buttons other than left and right click
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            draw_vertical(gc, event.getX());
+                            edge_type.put(num_edges, true);
+                            edge_coords.put(num_edges, (int)event.getX());
+                            num_edges++;
+
+                            // TODO: reorder edge lists
+
+                            System.out.println("num edges: " + num_edges);
+                            System.out.println("press at " + event.getX());
+                        }
+                        else if (event.getButton() == MouseButton.SECONDARY) {
+                            draw_vertical(gc, event.getX());
+                            edge_type.put(num_edges, false);
+                            edge_coords.put(num_edges, (int)event.getX());
+                            num_edges++;
+
+                            // TODO: reorder edge lists
+
+                            System.out.println("num edges: " + num_edges);
+                            System.out.println("press at " + event.getX());
+                        }
+                    }
                 }
         );
 
@@ -73,7 +106,12 @@ class DSignal { // TODO: handle mouse events
         g.stroke();
     }
 
-    private void draw_vertical(GraphicsContext g) {
-
+    private void draw_vertical(GraphicsContext g, double coord) { // TODO: decide on intuitive way to insert clock edges
+        g.setLineWidth(2.5); // 4.0 makes vertical line too thick
+        g.beginPath();
+        g.moveTo(coord, height);
+        g.lineTo(coord, 0);
+        g.stroke();
+        g.setLineWidth(4.0);
     }
 }
