@@ -16,24 +16,26 @@ import javafx.scene.input.MouseButton;
 import javafx.event.EventHandler;
 
 import java.util.HashMap;
-import java.util.ArrayList;
 
 class DSignal { // TODO: handle mouse events
     private int height;
     private int canvas_width;
     private int num_edges;
+    private double current_edge;
+    private double line_width;
+    private Canvas signal;
 
-    // key <= numbered edge from left to right. The first edge is numbered 0.
-    // value <= 0 for negative, 1 for positive
-    private HashMap<Integer, Boolean> edge_type;
-    private HashMap<Integer, Integer> edge_coords;
+    // edges are stored in coordinate, type (positive or negative) pairs
+    private HashMap<Integer, Boolean> edge_coord_type;
 
     DSignal() {
         height = 30;
         canvas_width = 500;
         num_edges = 0;
-        edge_type = new HashMap<Integer, Boolean>();
-        edge_coords = new HashMap<Integer, Integer>();
+        line_width = 3.0;
+        edge_coord_type = new HashMap<Integer, Boolean>();
+
+        signal = new Canvas(canvas_width, height);
         System.out.println("Signal created!");
     }
     HBox draw() {
@@ -41,7 +43,6 @@ class DSignal { // TODO: handle mouse events
         Button delete_signal = new Button("X");
         TextField name = new TextField("Signal_Name");
 
-        Canvas signal = new Canvas(canvas_width, height);
         GraphicsContext gc = signal.getGraphicsContext2D();
 
         // style the pane instead of the canvas
@@ -54,10 +55,6 @@ class DSignal { // TODO: handle mouse events
 //                "-fx-border-width: 2;" +
 //                "-fx-border-radius: 5;" +
 //                "-fx-border-color: blue;");
-
-        gc.setLineWidth(4.0);
-        gc.setFill(Color.BLACK);
-
         init_line(gc);
 
         HBox diagram = new HBox(delete_signal, name, signalPane);
@@ -72,26 +69,44 @@ class DSignal { // TODO: handle mouse events
                     public void handle(MouseEvent event) { // code is repeated to avoid event handling with mouse buttons other than left and right click
                         if (event.getButton() == MouseButton.PRIMARY) {
                             draw_vertical(gc, event.getX());
-                            edge_type.put(num_edges, true);
-                            edge_coords.put(num_edges, (int)event.getX());
+                            edge_coord_type.put((int)event.getX(), true);
+                            current_edge = event.getX();
                             num_edges++;
-
-                            // TODO: reorder edge lists
-
-                            System.out.println("num edges: " + num_edges);
-                            System.out.println("press at " + event.getX());
+//                          System.out.println("num edges: " + num_edges);
+//                          System.out.println("press at " + event.getX());
                         }
                         else if (event.getButton() == MouseButton.SECONDARY) {
                             draw_vertical(gc, event.getX());
-                            edge_type.put(num_edges, false);
-                            edge_coords.put(num_edges, (int)event.getX());
+                            edge_coord_type.put((int)event.getX(), false);
+                            current_edge = event.getX();
                             num_edges++;
-
-                            // TODO: reorder edge lists
-
-                            System.out.println("num edges: " + num_edges);
-                            System.out.println("press at " + event.getX());
+//                          System.out.println("num edges: " + num_edges);
+//                          System.out.println("press at " + event.getX());
                         }
+                    }
+                }
+        );
+
+        signalPane.addEventHandler(MouseEvent.MOUSE_DRAGGED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            draw_high(gc, event.getX());
+                        }
+                        else if (event.getButton() == MouseButton.SECONDARY) {
+                            draw_low(gc, event.getX());
+                        }
+                    }
+                }
+        );
+        // fix signal after releasing mouse button
+        signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        draw_vertical(gc, current_edge); // replace lost pixels at edge
+                        draw_vertical(gc, event.getX());
                     }
                 }
         );
@@ -101,17 +116,55 @@ class DSignal { // TODO: handle mouse events
 
     private void init_line(GraphicsContext g) {
         g.beginPath();
+        g.setLineWidth(line_width);
+        g.setFill(Color.BLACK);
         g.moveTo(0, height);
         g.lineTo(canvas_width, height);
         g.stroke();
     }
 
-    private void draw_vertical(GraphicsContext g, double coord) { // TODO: decide on intuitive way to insert clock edges
-        g.setLineWidth(2.5); // 4.0 makes vertical line too thick
+    private void draw_vertical(GraphicsContext g, double coord) {
+        g.setStroke(Color.BLACK);
+        g.setLineWidth(line_width); // 4.0 makes vertical line too thick
         g.beginPath();
         g.moveTo(coord, height);
         g.lineTo(coord, 0);
         g.stroke();
-        g.setLineWidth(4.0);
+    }
+
+    private void draw_high(GraphicsContext g, double coord) {
+        g.setStroke(Color.BLACK);
+        g.setLineWidth(line_width);
+
+        // draw high signal
+        g.beginPath();
+        g.moveTo(current_edge, 0);
+        g.lineTo(coord, 0);
+        g.stroke();
+
+        // erase low signal
+        g.setStroke(Color.WHITE);
+        g.beginPath();
+        g.moveTo(current_edge, height);
+        g.lineTo(coord, height);
+        g.stroke();
+    }
+
+    private void draw_low(GraphicsContext g, double coord) {
+        g.setStroke(Color.BLACK);
+        g.setLineWidth(line_width);
+
+        // draw low signal
+        g.beginPath();
+        g.moveTo(current_edge, height);
+        g.lineTo(coord, height);
+        g.stroke();
+
+        // erase low signal
+        g.setStroke(Color.WHITE);
+        g.beginPath();
+        g.moveTo(current_edge, 0);
+        g.lineTo(coord, 0);
+        g.stroke();
     }
 }
