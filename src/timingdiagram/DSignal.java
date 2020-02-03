@@ -15,31 +15,29 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 import javafx.event.EventHandler;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 class DSignal { // TODO: handle mouse events
     private int height;
     private int canvas_width;
-    private int num_edges;
-    private double current_edge;
-    private double line_width;
+    private int prev_mouse_coord;
+    private int current_edge;
+    private int line_width;
     private Canvas signal;
-
-    // edges are stored in coordinate, type (positive or negative) pairs
-    private HashMap<Integer, Boolean> edge_coord_type;
+//    private ArrayList<Integer> pos_edges;
+//    private ArrayList<Integer> neg_edges;
 
     DSignal() {
         height = 30;
         canvas_width = 500;
-        num_edges = 0;
-        line_width = 3.0;
-        edge_coord_type = new HashMap<Integer, Boolean>();
-
+        line_width = 3;
+        prev_mouse_coord = -1;
         signal = new Canvas(canvas_width, height);
+//        pos_edges = new ArrayList<>();
+//        neg_edges = new ArrayList<>();
         System.out.println("Signal created!");
     }
     HBox draw() {
-        // System.out.println("drawing");
         Button delete_signal = new Button("X");
         TextField name = new TextField("Signal_Name");
 
@@ -69,19 +67,11 @@ class DSignal { // TODO: handle mouse events
                     public void handle(MouseEvent event) { // code is repeated to avoid event handling with mouse buttons other than left and right click
                         if (event.getButton() == MouseButton.PRIMARY) {
                             draw_vertical(gc, event.getX());
-                            edge_coord_type.put((int)event.getX(), true);
-                            current_edge = event.getX();
-                            num_edges++;
-//                          System.out.println("num edges: " + num_edges);
-//                          System.out.println("press at " + event.getX());
+                            current_edge = (int)event.getX();
                         }
                         else if (event.getButton() == MouseButton.SECONDARY) {
                             draw_vertical(gc, event.getX());
-                            edge_coord_type.put((int)event.getX(), false);
-                            current_edge = event.getX();
-                            num_edges++;
-//                          System.out.println("num edges: " + num_edges);
-//                          System.out.println("press at " + event.getX());
+                            current_edge = (int)event.getX();
                         }
                     }
                 }
@@ -91,12 +81,18 @@ class DSignal { // TODO: handle mouse events
                 new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
+                        // get mouse direction
+                        if (prev_mouse_coord > 0) {
+
+                        }
+
                         if (event.getButton() == MouseButton.PRIMARY) {
-                            draw_high(gc, event.getX());
+                            draw_high(gc, (int)event.getX());
                         }
                         else if (event.getButton() == MouseButton.SECONDARY) {
-                            draw_low(gc, event.getX());
+                            draw_low(gc, (int)event.getX());
                         }
+                        prev_mouse_coord = (int)event.getX();
                     }
                 }
         );
@@ -125,14 +121,16 @@ class DSignal { // TODO: handle mouse events
 
     private void draw_vertical(GraphicsContext g, double coord) {
         g.setStroke(Color.BLACK);
-        g.setLineWidth(line_width); // 4.0 makes vertical line too thick
+        g.setLineWidth(line_width);
         g.beginPath();
         g.moveTo(coord, height);
         g.lineTo(coord, 0);
         g.stroke();
     }
 
-    private void draw_high(GraphicsContext g, double coord) {
+    private void draw_high(GraphicsContext g, int coord) {
+//        System.out.println("coord: " + coord);
+//        System.out.println("current edge: " + current_edge);
         g.setStroke(Color.BLACK);
         g.setLineWidth(line_width);
 
@@ -142,15 +140,14 @@ class DSignal { // TODO: handle mouse events
         g.lineTo(coord, 0);
         g.stroke();
 
+        draw_vertical(g, coord);
+
         // erase low signal
-        g.setStroke(Color.WHITE);
-        g.beginPath();
-        g.moveTo(current_edge, height);
-        g.lineTo(coord, height);
-        g.stroke();
+        g.setFill(Color.WHITE);
+        g.fillRect(current_edge + line_width, line_width, coord - current_edge - line_width, height - line_width);
     }
 
-    private void draw_low(GraphicsContext g, double coord) {
+    private void draw_low(GraphicsContext g, int coord) {
         g.setStroke(Color.BLACK);
         g.setLineWidth(line_width);
 
@@ -160,11 +157,10 @@ class DSignal { // TODO: handle mouse events
         g.lineTo(coord, height);
         g.stroke();
 
+        draw_vertical(g, coord);
+
         // erase low signal
-        g.setStroke(Color.WHITE);
-        g.beginPath();
-        g.moveTo(current_edge, 0);
-        g.lineTo(coord, 0);
-        g.stroke();
+        g.setFill(Color.WHITE);
+        g.fillRect(current_edge + line_width, 0, coord - current_edge - line_width, height - line_width);
     }
 }
