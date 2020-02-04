@@ -19,15 +19,22 @@ import java.util.Collections;
 import java.util.ArrayList;
 
 class DSignal {
+    /* Member Variables */
+    // layout
     private int height;
     private int canvas_width;
-    private int prev_mouse_coord;
-    public enum Direction {LEFT, RIGHT}
-    private Direction previous_direction;
-    private int click_edge;
-    private int dir_change;
     private int line_width;
     private Canvas signal;
+
+    // direction checking
+    private int prev_mouse_coord;
+    public enum Direction {LEFT, RIGHT}
+    public enum H_Position{HIGH, LOW}
+    private Direction previous_direction;
+    private int dir_change;
+
+    // edge tracking
+    private int click_edge;
     private ArrayList<Integer> pos_edges;
     private ArrayList<Integer> neg_edges;
 
@@ -42,7 +49,8 @@ class DSignal {
         neg_edges = new ArrayList<>();
         System.out.println("Signal created!");
     }
-    HBox draw() {
+
+    HBox draw() { // initializes all elements required for DSignal, including buttons, canvas, event handlers, etc.
         Button delete_signal = new Button("X");
         TextField name = new TextField("Signal_Name");
 
@@ -83,7 +91,7 @@ class DSignal {
                 new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        boolean draw_high = false;
+                        H_Position h_line_position = H_Position.LOW;
                         Direction current_direction;
                         // get mouse direction
                         if ((prev_mouse_coord > 0) && ((int)event.getX() < prev_mouse_coord)) { // moving left
@@ -92,11 +100,11 @@ class DSignal {
                                 dir_change = (int)event.getX();
                             }
                             if (event.getButton() == MouseButton.PRIMARY) {
-                                draw_high = true;
+                                h_line_position = H_Position.HIGH;
                             } else if (event.getButton() == MouseButton.SECONDARY) {
-                                draw_high = false;
+                                h_line_position = H_Position.LOW;
                             }
-                            draw_horizontal(gc, (int) event.getX(), click_edge, draw_high, current_direction);
+                            draw_horizontal(gc, (int) event.getX(), click_edge, h_line_position, current_direction);
                             previous_direction = Direction.LEFT;
                         }
 
@@ -107,11 +115,11 @@ class DSignal {
 
                             }
                             if (event.getButton() == MouseButton.PRIMARY) { // draw high
-                                draw_high = true;
+                                h_line_position = H_Position.HIGH;
                             } else if (event.getButton() == MouseButton.SECONDARY) { // draw low
-                                draw_high = false;
+                                h_line_position = H_Position.LOW;
                             }
-                            draw_horizontal(gc, (int) event.getX(), click_edge, draw_high, current_direction);
+                            draw_horizontal(gc, (int) event.getX(), click_edge, h_line_position, current_direction);
                             previous_direction = Direction.RIGHT;
                         }
                         prev_mouse_coord = (int)event.getX();
@@ -136,7 +144,7 @@ class DSignal {
         return diagram;
     }
 
-    private void init_line(GraphicsContext g) {
+    private void init_line(GraphicsContext g) { // draws default line
         g.beginPath();
         g.setLineWidth(line_width);
         g.setFill(Color.BLACK);
@@ -154,14 +162,13 @@ class DSignal {
         g.stroke();
     }
 
-    private void draw_horizontal(GraphicsContext g, int coord, int respective_edge, boolean draw_high, Direction current_direction) {
+    private void draw_horizontal(GraphicsContext g, int coord, int respective_edge, H_Position h_pos, Direction current_direction) {
+        boolean draw_high = (h_pos == H_Position.HIGH);
+
         g.setStroke(Color.BLACK);
         g.setLineWidth(line_width);
-
-//        System.out.println("resp edge:" + respective_edge);
-//        System.out.println("coord:" + coord);
-
         g.beginPath();
+
         if (draw_high) {
             g.moveTo(respective_edge, 0);
             g.lineTo(coord, 0);
