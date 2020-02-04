@@ -15,16 +15,21 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 import javafx.event.EventHandler;
 
-class DSignal { // TODO: handle mouse events
+import java.util.Collections;
+import java.util.ArrayList;
+
+class DSignal {
     private int height;
     private int canvas_width;
     private int prev_mouse_coord;
+    public enum Direction {LEFT, RIGHT}
+    private Direction previous_direction;
     private int click_edge;
-    private int drag_edge;
+    private int dir_change;
     private int line_width;
     private Canvas signal;
-//    private ArrayList<Integer> pos_edges;
-//    private ArrayList<Integer> neg_edges;
+    private ArrayList<Integer> pos_edges;
+    private ArrayList<Integer> neg_edges;
 
     DSignal() {
         height = 30;
@@ -32,9 +37,9 @@ class DSignal { // TODO: handle mouse events
         line_width = 3;
         prev_mouse_coord = -1;
         signal = new Canvas(canvas_width, height);
-        drag_edge = -1;
-//        pos_edges = new ArrayList<>();
-//        neg_edges = new ArrayList<>();
+        dir_change = -1;
+        pos_edges = new ArrayList<>();
+        neg_edges = new ArrayList<>();
         System.out.println("Signal created!");
     }
     HBox draw() {
@@ -46,13 +51,6 @@ class DSignal { // TODO: handle mouse events
         // style the pane instead of the canvas
         Pane signalPane = new Pane(signal);
         signalPane.setPrefSize(canvas_width, height);
-
-        // use to test pane sizing
-//        signalPane.setStyle("-fx-padding: 10;" +
-//                "-fx-border-style: solid inside;" +
-//                "-fx-border-width: 2;" +
-//                "-fx-border-radius: 5;" +
-//                "-fx-border-color: blue;");
         init_line(gc);
 
         HBox diagram = new HBox(delete_signal, name, signalPane);
@@ -68,10 +66,14 @@ class DSignal { // TODO: handle mouse events
                         if (event.getButton() == MouseButton.PRIMARY) {
                             draw_vertical(gc, (int)event.getX());
                             click_edge = (int)event.getX();
+                            pos_edges.add(click_edge);
+                            Collections.sort(pos_edges);
                         }
                         else if (event.getButton() == MouseButton.SECONDARY) {
                             draw_vertical(gc, (int)event.getX());
                             click_edge = (int)event.getX();
+                            neg_edges.add(click_edge);
+                            Collections.sort(neg_edges);
                         }
                     }
                 }
@@ -81,25 +83,36 @@ class DSignal { // TODO: handle mouse events
                 new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
+                        boolean draw_high = false;
+                        Direction current_direction;
                         // get mouse direction
-                        if ((prev_mouse_coord > 0) && ((int)event.getX() < prev_mouse_coord)) { // moving left and drag_edge not initialized
-                            if (drag_edge == -1) {
-                                drag_edge = (int) event.getX();
+                        if ((prev_mouse_coord > 0) && ((int)event.getX() < prev_mouse_coord)) { // moving left
+                            current_direction = Direction.LEFT;
+                            if (current_direction != previous_direction) {
+                                dir_change = (int)event.getX();
                             }
-
                             if (event.getButton() == MouseButton.PRIMARY) {
-                                draw_high(gc, (int) event.getX(), drag_edge);
+                                draw_high = true;
                             } else if (event.getButton() == MouseButton.SECONDARY) {
-                                draw_low(gc, (int) event.getX(), drag_edge);
+                                draw_high = false;
                             }
+                            draw_horizontal(gc, (int) event.getX(), click_edge, draw_high, current_direction);
+                            previous_direction = Direction.LEFT;
                         }
 
                         else if ((prev_mouse_coord > 0) && ((int)event.getX() > prev_mouse_coord)) { // moving right
-                            if (event.getButton() == MouseButton.PRIMARY) {
-                                draw_high(gc, (int) event.getX(), click_edge);
-                            } else if (event.getButton() == MouseButton.SECONDARY) {
-                                draw_low(gc, (int) event.getX(), click_edge);
+                            current_direction = Direction.RIGHT;
+                            if (current_direction != previous_direction) {
+                                dir_change = (int)event.getX();
+
                             }
+                            if (event.getButton() == MouseButton.PRIMARY) { // draw high
+                                draw_high = true;
+                            } else if (event.getButton() == MouseButton.SECONDARY) { // draw low
+                                draw_high = false;
+                            }
+                            draw_horizontal(gc, (int) event.getX(), click_edge, draw_high, current_direction);
+                            previous_direction = Direction.RIGHT;
                         }
                         prev_mouse_coord = (int)event.getX();
                     }
@@ -110,11 +123,16 @@ class DSignal { // TODO: handle mouse events
                 new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        drag_edge = -1;
+                        dir_change = -1;
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            neg_edges.add((int)event.getX());
+                        }
+                        else if (event.getButton() == MouseButton.SECONDARY) {
+                            pos_edges.add((int)event.getX());
+                        }
                     }
                 }
         );
-
         return diagram;
     }
 
@@ -136,39 +154,45 @@ class DSignal { // TODO: handle mouse events
         g.stroke();
     }
 
-    private void draw_high(GraphicsContext g, int coord, int respective_edge) { // TODO: fix drag edge case
-//        System.out.println("coord: " + coord);
-//        System.out.println("current edge: " + click_edge);
+    private void draw_horizontal(GraphicsContext g, int coord, int respective_edge, boolean draw_high, Direction current_direction) {
         g.setStroke(Color.BLACK);
         g.setLineWidth(line_width);
 
-        // draw high signal
-        g.beginPath();
-        g.moveTo(respective_edge, 0);
-        g.lineTo(coord, 0);
-        g.stroke();
+//        System.out.println("resp edge:" + respective_edge);
+//        System.out.println("coord:" + coord);
 
+        g.beginPath();
+        if (draw_high) {
+            g.moveTo(respective_edge, 0);
+            g.lineTo(coord, 0);
+            g.stroke();
+        }
+        else {
+            g.moveTo(respective_edge, height);
+            g.lineTo(coord, height);
+            g.stroke();
+        }
+
+        // if edge can be drawn
         draw_vertical(g, coord);
 
-        // erase low signal
-        g.setFill(Color.WHITE);
-        g.fillRect(respective_edge + line_width, line_width, coord - respective_edge - line_width, height - line_width);
-    }
-
-    private void draw_low(GraphicsContext g, int coord, int respective_edge) {
-        g.setStroke(Color.BLACK);
-        g.setLineWidth(line_width);
-
-        // draw low signal
-        g.beginPath();
-        g.moveTo(respective_edge, height);
-        g.lineTo(coord, height);
-        g.stroke();
-
-        draw_vertical(g, coord);
-
-        // erase low signal
-        g.setFill(Color.WHITE);
-        g.fillRect(respective_edge + line_width, 0, coord - respective_edge - line_width, height - line_width);
+        if (draw_high) { // erase low signal
+            g.setFill(Color.WHITE);
+            if (current_direction == Direction.LEFT) {
+                g.fillRect(coord, line_width, respective_edge - coord, height);
+            }
+            else {
+                g.fillRect(respective_edge, line_width, coord - respective_edge, height);
+            }
+        }
+        else {
+            g.setFill(Color.WHITE);
+            if (current_direction == Direction.LEFT) {
+                g.fillRect(coord, 0, respective_edge - coord, height - line_width);
+            }
+            else {
+                g.fillRect(respective_edge, 0, coord - respective_edge, height - line_width);
+            }
+        }
     }
 }
