@@ -21,7 +21,10 @@ import java.util.Collections;
 import java.util.ArrayList;
 
 class DSignal {
-    /* Member Variables */
+    // enums
+    public enum Direction {LEFT, RIGHT, NULL}
+    public enum H_Position{HIGH, LOW}
+
     // layout
     private int height;
     private int canvas_width;
@@ -30,8 +33,6 @@ class DSignal {
 
     // direction checking
     private int prev_mouse_coord;
-    public enum Direction {LEFT, RIGHT, NULL}
-    public enum H_Position{HIGH, LOW}
     private H_Position h_line_position;
     private Direction previous_direction;
     private Direction current_direction;
@@ -113,12 +114,11 @@ class DSignal {
                                 initial_direction = Direction.LEFT;
                             }
                             current_direction = Direction.LEFT;
-                            if ((current_direction != previous_direction) && (current_direction != Direction.NULL) && (previous_direction != Direction.NULL)) {
-                                current_edge = (int)event.getX();
+                            if ((current_direction != previous_direction) /*&& (current_direction != Direction.NULL)*/ && (previous_direction != Direction.NULL)) {
+                                current_edge = (int)event.getX(); // the edge is to be erased, but must first be passed to draw_horizontal
                                 dir_change = true;
-                                System.out.println("direction change: " + dir_change);
                                 // if the click edge has not been reached
-                                if ((current_direction != initial_direction) && (initial_direction != Direction.NULL)) {
+                                if ((current_direction != initial_direction) /*&& (initial_direction != Direction.NULL)*/) {
                                     System.out.println("flipping");
                                     h_line_flip();
                                 }
@@ -126,7 +126,6 @@ class DSignal {
                                     if (dir_change) { // returned to initial direction from direction change
                                         h_line_flip();
                                     }
-
                                     dir_change = false;
                                 }
                             }
@@ -142,7 +141,6 @@ class DSignal {
                             if ((current_direction != previous_direction) && (previous_direction != Direction.NULL)) {
                                 current_edge = (int)event.getX();
                                 dir_change = true;
-                                System.out.println("direction change: " + dir_change);
                                 if ((current_direction != initial_direction) && (initial_direction != Direction.NULL)) {
                                     System.out.println("flipping");
                                     h_line_flip();
@@ -201,8 +199,7 @@ class DSignal {
         g.stroke();
     }
 
-    private void draw_horizontal(GraphicsContext g, int coord, int respective_edge, H_Position h_pos, Direction current_direction) { // TODO: erase edge after direction change
-//        System.out.println("current dirction: " + current_direction);
+    private void draw_horizontal(GraphicsContext g, int coord, int respective_edge, H_Position h_pos, Direction current_direction) {
         boolean draw_high = (h_pos == H_Position.HIGH);
 
         g.setStroke(Color.BLACK);
@@ -235,27 +232,37 @@ class DSignal {
             if (current_direction == Direction.LEFT) { // erase right
                 rect_x = coord;
                 rect_width = respective_edge - coord;
-//                if (dir_change) { // moving left after direction change
-////                    System.out.println("direction change");
-//                    rect_width += line_width;
-//                }
+                if (dir_change) { // erase edge
+                    rect_width += line_width;
+                }
             }
-            else {
+            else { // erase left
                 rect_x = respective_edge;
                 rect_width = coord - respective_edge;
+                if (dir_change) { // erase edge
+                    rect_x -= line_width;
+                    rect_width += line_width;
+                }
             }
         }
-        else {
+        else { // draw low
             g.setFill(Color.WHITE);
             rect_y = 0;
             rect_height = height - line_width;
-            if (current_direction == Direction.LEFT) {
+            if (current_direction == Direction.LEFT) { // erase right
                 rect_x = coord;
                 rect_width = respective_edge - coord;
+                if (dir_change) { // erase edge
+                    rect_width += line_width;
+                }
             }
-            else {
+            else { // erase left
                 rect_x = respective_edge;
                 rect_width = coord - respective_edge;
+                if (dir_change) { // erase edge
+                    rect_x -= line_width;
+                    rect_width += line_width;
+                }
             }
         }
         g.fillRect(rect_x, rect_y, rect_width, rect_height);
