@@ -304,13 +304,13 @@ class DSignal {
                 return true;
             }
             for (int i = 0; (i < pos_edges.size() && (i < neg_edges.size())); i++) {
-                if (drawing_high) {
+                if (drawing_high && edges_balanced()) { // avoid the case where we are "in between" because we haven't finished adding an edge through dragging
                     if ((coord >= pos_edges.get(i)) && (coord <= neg_edges.get(i))) { // positive edge placement on high signal
                         System.out.println("pos edge on high signal: in between " + pos_edges.get(i) + "," + neg_edges.get(i));
                         return true;
                     }
                 }
-                else {
+                else if (drawing_low && edges_balanced()){
                     if ((coord >= neg_edges.get(i)) && (coord <= pos_edges.get(i))) { // negative edge placement on low signal
                         System.out.println("neg edge on low signal: in between " + pos_edges.get(i) + "," + neg_edges.get(i));
                         return true;
@@ -319,5 +319,9 @@ class DSignal {
             }
         }
         return false;
+    }
+
+    boolean edges_balanced() {
+        return (pos_edges.size() == neg_edges.size());
     }
 }
