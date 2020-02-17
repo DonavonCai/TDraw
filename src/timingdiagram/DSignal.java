@@ -233,9 +233,10 @@ class DSignal {
         int rect_y;
         int rect_width;
         int rect_height;
+
         if (draw_high) {
             g.setFill(Color.WHITE);
-            rect_y = line_width;
+            rect_y = line_width - 1;
             rect_height = height;
             if (current_direction == Direction.LEFT) { // erase right
                 rect_x = coord;
