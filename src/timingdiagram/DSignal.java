@@ -12,10 +12,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.MouseButton;
 import javafx.event.EventHandler;
 
-import java.util.Collections;
 import java.util.ArrayList;
 
 class DSignal {
