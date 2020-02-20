@@ -113,25 +113,7 @@ class DSignal {
                 new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        moving_backwards = false;
-                        previous_direction = Direction.NULL;
-                        current_direction = Direction.NULL;
-                        initial_direction = Direction.NULL;
-                        prev_mouse_coord = -1;
-                        if (event.getButton() == MouseButton.PRIMARY) {
-//                            pos_edges.add(click_edge_to_add);
-//                            Collections.sort(pos_edges);
-                            neg_edges.add((int)event.getX());
-                            Collections.sort(neg_edges);
-                            System.out.println("release: adding neg edge at: " + event.getX());
-                        }
-                        else if (event.getButton() == MouseButton.SECONDARY) {
-//                            neg_edges.add(click_edge_to_add);
-//                            Collections.sort(neg_edges);
-                            pos_edges.add((int)event.getX());
-                            Collections.sort(pos_edges);
-                            System.out.println("release: adding pos edge at: " + event.getX());
-                        }
+                        release_handler.handle(event);
                     }
                 }
         );
