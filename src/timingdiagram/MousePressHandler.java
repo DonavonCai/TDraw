@@ -5,38 +5,38 @@ import javafx.scene.input.MouseButton;
 
 import java.util.Collections;
 
-public class MousePressHandler {
-    private DSignal d_sig;
+public class MousePressHandler extends Handler {
 
     MousePressHandler(DSignal d) {
-        d_sig = d;
+        super(d);
     }
 
-    protected void handle(MouseEvent event) {
+    @Override
+    public void handle(MouseEvent event) {
         if (event.getButton() == MouseButton.PRIMARY) {
-            d_sig.previous_direction = DSignal.Direction.NULL;
-            d_sig.h_line_position = DSignal.H_Position.HIGH;
-            d_sig.erase_edge = false;
-            if (!d_sig.in_between_edges((int)event.getX())) {
-                d_sig.draw_vertical((int) event.getX());
-                d_sig.current_edge = (int) event.getX();
-                d_sig.pos_edges.add(d_sig.current_edge);
-                Collections.sort(d_sig.pos_edges);
-                d_sig.click_edge_to_add = d_sig.current_edge;
-                System.out.println("adding positive edge at: " + d_sig.current_edge);
+            super.d_sig.previous_direction = DSignal.Direction.NULL;
+            super.d_sig.h_line_position = DSignal.H_Position.HIGH;
+            super.d_sig.erase_edge = false;
+            if (!super.in_between_edges((int)event.getX())) {
+                super.draw_vertical((int) event.getX());
+                super.d_sig.current_edge = (int) event.getX();
+                super.d_sig.pos_edges.add(super.d_sig.current_edge);
+                Collections.sort(super.d_sig.pos_edges);
+                super.d_sig.click_edge_to_add = super.d_sig.current_edge;
+                System.out.println("adding positive edge at: " + super.d_sig.current_edge);
             }
         }
         else if (event.getButton() == MouseButton.SECONDARY) {
-            d_sig.previous_direction = DSignal.Direction.NULL;
-            d_sig.h_line_position = DSignal.H_Position.LOW;
-            d_sig.erase_edge = false;
-            if (!d_sig.in_between_edges((int)event.getX())) {
-                d_sig.draw_vertical((int) event.getX());
-                d_sig.current_edge = (int) event.getX();
-                d_sig.neg_edges.add(d_sig.current_edge);
-                Collections.sort(d_sig.neg_edges);
-                d_sig.click_edge_to_add = d_sig.current_edge;
-                System.out.println("adding negative edge at: " + d_sig.current_edge);
+            super.d_sig.previous_direction = DSignal.Direction.NULL;
+            super.d_sig.h_line_position = DSignal.H_Position.LOW;
+            super.d_sig.erase_edge = false;
+            if (!super.in_between_edges((int)event.getX())) {
+                super.draw_vertical((int) event.getX());
+                super.d_sig.current_edge = (int) event.getX();
+                super.d_sig.neg_edges.add(super.d_sig.current_edge);
+                Collections.sort(super.d_sig.neg_edges);
+                super.d_sig.click_edge_to_add = super.d_sig.current_edge;
+                System.out.println("adding negative edge at: " + super.d_sig.current_edge);
             }
         }
     }
