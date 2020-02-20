@@ -28,21 +28,27 @@ class DSignal {
     private int canvas_width;
     private int line_width;
     private Canvas signal;
+    protected GraphicsContext gc;
 
     // direction checking
-    private int prev_mouse_coord;
-    private H_Position h_line_position;
-    private Direction previous_direction;
-    private Direction current_direction;
-    private Direction initial_direction;
-    private boolean moving_backwards;
+    protected int prev_mouse_coord;
+    protected H_Position h_line_position;
+    protected Direction previous_direction;
+    protected Direction current_direction;
+    protected Direction initial_direction;
+    protected boolean moving_backwards;
+
+    // event handling
+    private MousePressHandler press_handler;
+    private MouseDragHandler drag_handler;
+    private MouseReleaseHandler release_handler;
 
     // edge tracking
-    private int current_edge;
-    private int click_edge_to_add;
-    private boolean erase_edge;
-    private ArrayList<Integer> pos_edges;
-    private ArrayList<Integer> neg_edges;
+    protected int current_edge;
+    protected int click_edge_to_add;
+    protected boolean erase_edge;
+    protected ArrayList<Integer> pos_edges;
+    protected ArrayList<Integer> neg_edges;
 
     DSignal() {
         System.out.println("Signal created!");
@@ -51,6 +57,8 @@ class DSignal {
         canvas_width = 500;
         line_width = 3;
         signal = new Canvas(canvas_width, height);
+        gc = signal.getGraphicsContext2D();
+
         // direction checking
         prev_mouse_coord = -1;
         previous_direction = Direction.NULL;
@@ -59,6 +67,10 @@ class DSignal {
         moving_backwards = false;
         erase_edge = false;
         h_line_position = H_Position.LOW;
+        // event handling
+        press_handler = new MousePressHandler(this);
+        drag_handler = new MouseDragHandler(this);
+        release_handler = new MouseReleaseHandler(this);
         // data
         pos_edges = new ArrayList<>();
         neg_edges = new ArrayList<>();
@@ -68,12 +80,10 @@ class DSignal {
         Button delete_signal = new Button("X");
         TextField name = new TextField("Signal_Name");
 
-        GraphicsContext gc = signal.getGraphicsContext2D();
-
         // style the pane instead of the canvas
         Pane signalPane = new Pane(signal);
         signalPane.setPrefSize(canvas_width, height);
-        init_line(gc);
+        init_line();
 
         HBox diagram = new HBox(delete_signal, name, signalPane);
 
@@ -85,32 +95,8 @@ class DSignal {
                 new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) { // code is repeated to avoid event handling with mouse buttons other than left and right click
-                        if (event.getButton() == MouseButton.PRIMARY) {
-                            previous_direction = Direction.NULL;
-                            h_line_position = H_Position.HIGH;
-                            erase_edge = false;
-                            if (!in_between_edges((int)event.getX())) {
-                                draw_vertical(gc, (int) event.getX());
-                                current_edge = (int) event.getX();
-                                pos_edges.add(current_edge);
-                                Collections.sort(pos_edges);
-                                click_edge_to_add = current_edge;
-                                System.out.println("adding positive edge at: " + current_edge);
-                            }
-                        }
-                        else if (event.getButton() == MouseButton.SECONDARY) {
-                            previous_direction = Direction.NULL;
-                            h_line_position = H_Position.LOW;
-                            erase_edge = false;
-                            if (!in_between_edges((int)event.getX())) {
-                                draw_vertical(gc, (int) event.getX());
-                                current_edge = (int) event.getX();
-                                neg_edges.add(current_edge);
-                                Collections.sort(neg_edges);
-                                click_edge_to_add = current_edge;
-                                System.out.println("adding negative edge at: " + current_edge);
-                            }
-                        }
+                        press_handler.handle(event);
+//
                     }
                 }
         );
@@ -153,9 +139,9 @@ class DSignal {
                             }
                         }
                         if (!in_between_edges((int)event.getX())) { // this vertical line is drawn over in draw_horizontal if mouse continues to be dragged
-                            draw_vertical(gc, (int)event.getX());
+                            draw_vertical((int)event.getX());
                         }
-                        draw_horizontal(gc, (int) event.getX(), current_edge, current_direction, erase_edge);
+                        draw_horizontal((int) event.getX(), current_edge, current_direction, erase_edge);
                         previous_direction = current_direction;
                         prev_mouse_coord = (int)event.getX();
                     }
@@ -191,41 +177,41 @@ class DSignal {
         return diagram;
     }
 
-    private void init_line(GraphicsContext g) { // draws default line
-        g.beginPath();
-        g.setLineWidth(line_width);
-        g.setFill(Color.BLACK);
-        g.moveTo(0, height);
-        g.lineTo(canvas_width, height);
-        g.stroke();
-        g.stroke(); // second stroke makes it more solid for some reason??? just leave it in until you figure out why
+    private void init_line() { // draws default line
+        gc.beginPath();
+        gc.setLineWidth(line_width);
+        gc.setFill(Color.BLACK);
+        gc.moveTo(0, height);
+        gc.lineTo(canvas_width, height);
+        gc.stroke();
+        gc.stroke(); // second stroke makes it more solid for some reason??? just leave it in until you figure out why
     }
 
-    private void draw_vertical(GraphicsContext g, int coord) {
-        g.beginPath();
-        g.setStroke(Color.BLACK);
-        g.setLineWidth(line_width);
-        g.moveTo(coord, height);
-        g.lineTo(coord, 0);
-        g.stroke();
+    protected void draw_vertical(int coord) {
+        gc.beginPath();
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(line_width);
+        gc.moveTo(coord, height);
+        gc.lineTo(coord, 0);
+        gc.stroke();
     }
 
-    private void draw_horizontal(GraphicsContext g, int coord, int respective_edge, Direction current_direction, boolean erase_respective_edge) { // TODO: only draw vertical if applicable
+    private void draw_horizontal(int coord, int respective_edge, Direction current_direction, boolean erase_respective_edge) { // TODO: only draw vertical if applicable
         boolean draw_high = (h_line_position == H_Position.HIGH);
 
-        g.beginPath();
-        g.setStroke(Color.BLACK);
-        g.setLineWidth(line_width);
+        gc.beginPath();
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(line_width);
 
         if (draw_high) {
-            g.moveTo(respective_edge, 0);
-            g.lineTo(coord, 0);
-            g.stroke();
+            gc.moveTo(respective_edge, 0);
+            gc.lineTo(coord, 0);
+            gc.stroke();
         }
         else {
-            g.moveTo(respective_edge, height);
-            g.lineTo(coord, height);
-            g.stroke();
+            gc.moveTo(respective_edge, height);
+            gc.lineTo(coord, height);
+            gc.stroke();
         }
 
         // erase signal
@@ -235,7 +221,7 @@ class DSignal {
         int rect_height;
 
         if (draw_high) {
-            g.setFill(Color.WHITE);
+            gc.setFill(Color.WHITE);
             rect_y = line_width - 1;
             rect_height = height;
             if (current_direction == Direction.LEFT) { // erase right
@@ -255,7 +241,7 @@ class DSignal {
             }
         }
         else { // draw low
-            g.setFill(Color.WHITE);
+            gc.setFill(Color.WHITE);
             rect_y = 0;
             rect_height = height - line_width + 1;
             if (current_direction == Direction.LEFT) { // erase right
@@ -274,7 +260,7 @@ class DSignal {
                 }
             }
         }
-        g.fillRect(rect_x, rect_y, rect_width, rect_height);
+        gc.fillRect(rect_x, rect_y, rect_width, rect_height);
     }
 
     void h_line_flip() {
