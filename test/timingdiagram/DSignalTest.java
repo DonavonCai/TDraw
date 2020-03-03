@@ -28,6 +28,6 @@ public class DSignalTest {
 
     @AfterClass
     public static void cleanup() {
-        System.out.println("DSignal tests finished. Cleaning up!");
+        System.out.println("DSignal tests finished.");
     }
 }

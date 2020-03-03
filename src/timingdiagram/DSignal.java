@@ -41,6 +41,10 @@ class DSignal {
     private MouseDragHandler drag_handler;
     private MouseReleaseHandler release_handler;
 
+    protected void setPressHandler(MousePressHandler m) {press_handler = m;}
+    protected void setDragHandler(MouseDragHandler m) {drag_handler = m;}
+    protected void setReleaseHandler(MouseReleaseHandler m) {release_handler = m;}
+
     // edge tracking
     protected int current_edge;
     protected int click_edge_to_add;
