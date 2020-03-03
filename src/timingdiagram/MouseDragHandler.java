@@ -14,30 +14,30 @@ public class MouseDragHandler extends Handler {
     public void handle(MouseEvent event) {
 //                        System.out.println("initial direction: " + initial_direction);
         // get mouse direction
-        if ((super.d_sig.prev_mouse_coord > 0) && ((int)event.getX() < super.d_sig.prev_mouse_coord)) { // moving left
+        if (super.d_sig.prev_mouse_coord > 0 && (int)event.getX() < super.d_sig.prev_mouse_coord) { // moving left
             if (super.d_sig.initial_direction == DSignal.Direction.NULL) { // set initial direction
                 super.d_sig.initial_direction = DSignal.Direction.LEFT;
             }
             super.d_sig.current_direction = DSignal.Direction.LEFT;
         }
-        else if ((super.d_sig.prev_mouse_coord > 0) && ((int)event.getX() > super.d_sig.prev_mouse_coord)) { // moving right
+        else if (super.d_sig.prev_mouse_coord > 0 && (int)event.getX() > super.d_sig.prev_mouse_coord) { // moving right
             if (super.d_sig.initial_direction == DSignal.Direction.NULL) {
                 super.d_sig.initial_direction = DSignal.Direction.RIGHT;
             }
             super.d_sig.current_direction = DSignal.Direction.RIGHT;
         }
 
-        if ((super.d_sig.current_direction != super.d_sig.previous_direction) && (super.d_sig.previous_direction != DSignal.Direction.NULL)) { // direction change
+        if (super.d_sig.current_direction != super.d_sig.previous_direction && super.d_sig.previous_direction != DSignal.Direction.NULL) { // direction change
             System.out.println("direction change");
             super.d_sig.current_edge = (int)event.getX();
             super.d_sig.moving_backwards = true;
-            if ((super.d_sig.current_direction != super.d_sig.initial_direction) && (super.d_sig.initial_direction != DSignal.Direction.NULL)) {
+            if (super.d_sig.current_direction != super.d_sig.initial_direction && super.d_sig.initial_direction != DSignal.Direction.NULL && !in_between_edges((int)event.getX())) {
                 System.out.println("flipping");
                 super.h_line_flip();
                 super.d_sig.erase_edge = true;
             }
             else if (super.d_sig.current_direction == super.d_sig.initial_direction) {
-                if (super.d_sig.moving_backwards) { // returned to initial direction from direction change
+                if (super.d_sig.moving_backwards && !in_between_edges((int)event.getX())) { // returned to initial direction from direction change
                     System.out.println("flip");
                     super.h_line_flip();
                     super.d_sig.erase_edge = true;
@@ -77,8 +77,8 @@ public class MouseDragHandler extends Handler {
         int rect_width;
         int rect_height;
 
+        super.d_sig.gc.setFill(Color.WHITE);
         if (draw_high) {
-            super.d_sig.gc.setFill(Color.WHITE);
             rect_y = super.d_sig.line_width - 1;
             rect_height = super.d_sig.height;
             if (current_direction == DSignal.Direction.LEFT) { // erase right
@@ -98,7 +98,6 @@ public class MouseDragHandler extends Handler {
             }
         }
         else { // draw low
-            super.d_sig.gc.setFill(Color.WHITE);
             rect_y = 0;
             rect_height = super.d_sig.height - super.d_sig.line_width + 1;
             if (current_direction == DSignal.Direction.LEFT) { // erase right

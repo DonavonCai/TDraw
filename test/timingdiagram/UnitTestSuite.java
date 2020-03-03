@@ -6,8 +6,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({
-        DSignalTest.class
-//        MousePressHandlerTest.class,
+        DSignalTest.class,
+        MousePressHandlerTest.class
 //        MouseDragHandlerTest.class,
 //        MouseReleaseHandlerTest.class
 })
