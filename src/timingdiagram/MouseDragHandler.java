@@ -3,6 +3,7 @@ package timingdiagram;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import java.util.Collections;
 
 public class MouseDragHandler extends Handler {
 
@@ -28,32 +29,30 @@ public class MouseDragHandler extends Handler {
         }
 
         if (super.d_sig.current_direction != super.d_sig.previous_direction && super.d_sig.previous_direction != DSignal.Direction.NULL) { // direction change
-            System.out.println("direction change");
+//            System.out.println("direction change");
             super.d_sig.current_edge = (int)event.getX();
-            super.d_sig.moving_backwards = true;
-            if (super.d_sig.current_direction != super.d_sig.initial_direction && super.d_sig.initial_direction != DSignal.Direction.NULL && !in_between_edges((int)event.getX())) {
-                System.out.println("flipping");
-                super.h_line_flip();
-                super.d_sig.erase_edge = true;
-            }
-            else if (super.d_sig.current_direction == super.d_sig.initial_direction) {
-                if (super.d_sig.moving_backwards && !in_between_edges((int)event.getX())) { // returned to initial direction from direction change
-                    System.out.println("flip");
-                    super.h_line_flip();
-                    super.d_sig.erase_edge = true;
-                    super.d_sig.moving_backwards = false;
+
+            if (!in_between_edges(super.d_sig.current_edge)) {
+//                System.out.println("dir change: adding edge at: " + super.d_sig.current_edge);
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    super.d_sig.neg_edges.add(d_sig.current_edge);
+                    Collections.sort(super.d_sig.neg_edges);
+                }
+                else if (event.getButton() == MouseButton.SECONDARY) {
+                    super.d_sig.pos_edges.add(d_sig.current_edge);
+                    Collections.sort(super.d_sig.pos_edges);
                 }
             }
         }
         if (!super.in_between_edges((int)event.getX())) { // this vertical line is drawn over in draw_horizontal if mouse continues to be dragged
             super.draw_vertical((int)event.getX());
+            draw_horizontal((int) event.getX(), super.d_sig.current_edge, super.d_sig.current_direction);
         }
-        draw_horizontal((int) event.getX(), super.d_sig.current_edge, super.d_sig.current_direction, super.d_sig.erase_edge);
         super.d_sig.previous_direction = super.d_sig.current_direction;
         super.d_sig.prev_mouse_coord = (int)event.getX();
     }
 
-    protected void draw_horizontal(int coord, int respective_edge, DSignal.Direction current_direction, boolean erase_respective_edge) { // TODO: only draw vertical if applicable
+    protected void draw_horizontal(int coord, int respective_edge, DSignal.Direction current_direction) { // TODO: only draw vertical if applicable
         boolean draw_high = (super.d_sig.h_line_position == DSignal.H_Position.HIGH);
 
         super.d_sig.gc.beginPath();
@@ -84,17 +83,10 @@ public class MouseDragHandler extends Handler {
             if (current_direction == DSignal.Direction.LEFT) { // erase right
                 rect_x = coord;
                 rect_width = respective_edge - coord;
-                if (erase_respective_edge) { // erase edge
-                    rect_width += super.d_sig.line_width;
-                }
             }
             else { // erase left
                 rect_x = respective_edge;
                 rect_width = coord - respective_edge;
-                if (erase_respective_edge) { // erase edge
-                    rect_x -= super.d_sig.line_width;
-                    rect_width += super.d_sig.line_width;
-                }
             }
         }
         else { // draw low
@@ -103,17 +95,10 @@ public class MouseDragHandler extends Handler {
             if (current_direction == DSignal.Direction.LEFT) { // erase right
                 rect_x = coord;
                 rect_width = respective_edge - coord;
-                if (erase_respective_edge) { // erase edge
-                    rect_width += super.d_sig.line_width;
-                }
             }
             else { // erase left
                 rect_x = respective_edge;
                 rect_width = coord - respective_edge;
-                if (erase_respective_edge) { // erase edge
-                    rect_x -= super.d_sig.line_width;
-                    rect_width += super.d_sig.line_width;
-                }
             }
         }
         super.d_sig.gc.fillRect(rect_x, rect_y, rect_width, rect_height);
