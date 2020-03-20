@@ -31,6 +31,7 @@ public class MousePressHandler extends Handler {
             super.d_sig.h_line_position = DSignal.H_Position.LOW;
             super.d_sig.erase_edge = false;
             if (!super.in_between_edges((int)event.getX())) {
+                System.out.println("not between");
                 super.draw_vertical((int) event.getX());
                 super.d_sig.current_edge = (int) event.getX();
                 super.d_sig.neg_edges.add(super.d_sig.current_edge);
