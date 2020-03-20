@@ -34,7 +34,6 @@ class DSignal {
     protected Direction previous_direction;
     protected Direction current_direction;
     protected Direction initial_direction;
-    protected boolean moving_backwards;
 
     // event handling
     private MousePressHandler press_handler;
@@ -66,7 +65,6 @@ class DSignal {
         previous_direction = Direction.NULL;
         current_direction = Direction.NULL;
         initial_direction = Direction.NULL;
-        moving_backwards = false;
         erase_edge = false;
         h_line_position = H_Position.LOW;
         // event handling

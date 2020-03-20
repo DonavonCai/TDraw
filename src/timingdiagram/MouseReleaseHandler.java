@@ -15,7 +15,6 @@ public class MouseReleaseHandler extends Handler {
         if (in_between_edges((int)event.getX())) {
             return;
         }
-        super.d_sig.moving_backwards = false;
         super.d_sig.previous_direction = DSignal.Direction.NULL;
         super.d_sig.current_direction = DSignal.Direction.NULL;
         super.d_sig.initial_direction = DSignal.Direction.NULL;

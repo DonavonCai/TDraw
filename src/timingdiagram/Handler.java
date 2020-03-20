@@ -36,7 +36,7 @@ abstract class Handler {
             return false;
         }
         else {
-            if (drawing_low && !pos_empty && coord < d_sig.pos_edges.get(0) && !d_sig.moving_backwards) { // low signal before first positive edge, !moving_backwards so you can drag left initially
+            if (drawing_low && !pos_empty && coord < d_sig.pos_edges.get(0)) { // low signal before first positive edge\
 //                System.out.println("low sig before 1st pos edge");
                 return true;
             }

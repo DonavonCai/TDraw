@@ -15,6 +15,10 @@ public class MouseDragHandler extends Handler {
     public void handle(MouseEvent event) {
 //                        System.out.println("initial direction: " + initial_direction);
         // get mouse direction
+        if (super.in_between_edges((int)event.getX())) {
+            return;
+        }
+
         if (super.d_sig.prev_mouse_coord > 0 && (int)event.getX() < super.d_sig.prev_mouse_coord) { // moving left
             if (super.d_sig.initial_direction == DSignal.Direction.NULL) { // set initial direction
                 super.d_sig.initial_direction = DSignal.Direction.LEFT;
