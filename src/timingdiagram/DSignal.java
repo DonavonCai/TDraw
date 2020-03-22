@@ -46,7 +46,7 @@ class DSignal {
 
     // edge tracking
     protected int current_edge;
-    protected int click_edge_to_add;
+    protected int initial_edge;
     protected boolean erase_edge;
     protected ArrayList<Integer> pos_edges;
     protected ArrayList<Integer> neg_edges;

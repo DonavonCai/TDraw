@@ -3,6 +3,8 @@ package timingdiagram;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class MouseDragHandler extends Handler {
@@ -15,10 +17,6 @@ public class MouseDragHandler extends Handler {
     public void handle(MouseEvent event) {
 //                        System.out.println("initial direction: " + initial_direction);
         // get mouse direction
-        if (super.in_between_edges((int)event.getX())) {
-            return;
-        }
-
         if (super.d_sig.prev_mouse_coord > 0 && (int)event.getX() < super.d_sig.prev_mouse_coord) { // moving left
             if (super.d_sig.initial_direction == DSignal.Direction.NULL) { // set initial direction
                 super.d_sig.initial_direction = DSignal.Direction.LEFT;
@@ -48,15 +46,67 @@ public class MouseDragHandler extends Handler {
                 }
             }
         }
+
         if (!super.in_between_edges((int)event.getX())) { // this vertical line is drawn over in draw_horizontal if mouse continues to be dragged
             super.draw_vertical((int)event.getX());
-            draw_horizontal((int) event.getX(), super.d_sig.current_edge, super.d_sig.current_direction);
+//            draw_horizontal((int) event.getX(), super.d_sig.current_edge, super.d_sig.current_direction);
         }
+        draw_horizontal((int) event.getX(), super.d_sig.current_edge, super.d_sig.current_direction);
+
+        // FIXME: delete edges from initial to current
+
+//            int left = idx_left(press, 'p');
+//            int right = idx_right(release, 'p');
+//            if (left != -1 && right != -1) {
+//                super.d_sig.pos_edges.subList(left, right).clear();
+//            }
+//
+//            left = idx_left(press, 'n');
+//            right = idx_right(release, 'n');
+//            if (left != -1 && right != -1) {
+//                super.d_sig.neg_edges.subList(left, right).clear();
+//            }
+
         super.d_sig.previous_direction = super.d_sig.current_direction;
         super.d_sig.prev_mouse_coord = (int)event.getX();
     }
 
-    protected void draw_horizontal(int coord, int respective_edge, DSignal.Direction current_direction) { // TODO: only draw vertical if applicable
+    private int idx_left(int edge, char code) {
+        int r = -1;
+        ArrayList<Integer> arr = null;
+        if (code == 'p') {
+            arr = super.d_sig.pos_edges;
+        }
+        else if (code == 'n') {
+            arr = super.d_sig.neg_edges;
+        }
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr.get(i) > edge) {
+                return i;
+            }
+        }
+        return r;
+    }
+
+    private int idx_right(int edge, char code) {
+        int r = -1;
+        ArrayList<Integer> arr = null;
+        if (code == 'p') {
+            arr = super.d_sig.pos_edges;
+        }
+        else if (code == 'n') {
+            arr = super.d_sig.neg_edges;
+        }
+
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr.get(i) > edge) {
+                r = i;
+            }
+        }
+        return r;
+    }
+
+    protected void draw_horizontal(int coord, int respective_edge, DSignal.Direction current_direction) {
         boolean draw_high = (super.d_sig.h_line_position == DSignal.H_Position.HIGH);
 
         super.d_sig.gc.beginPath();
