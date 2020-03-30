@@ -4,7 +4,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 
 import java.util.Collections;
-import java.util.ArrayList;
 
 public class  MouseReleaseHandler extends Handler {
 
@@ -25,21 +24,29 @@ public class  MouseReleaseHandler extends Handler {
         int release = (int)event.getX();
 
         if (event.getButton() == MouseButton.PRIMARY || event.getButton() == MouseButton.SECONDARY) {
-            if (super.d_sig.initial_edge_is_neg) { // if initial edge is neg, closing edge is pos
+            if (super.d_sig.release_edge_pos) {
                 super.d_sig.pos_edges.add(release);
                 Collections.sort(super.d_sig.pos_edges);
-                System.out.println("release: adding pos edge at: " + event.getX() + ", " + event.getY());
+                System.out.println("release: adding pos edge at: " + event.getX());
             }
             else {
                 super.d_sig.neg_edges.add(release);
                 Collections.sort(super.d_sig.neg_edges);
-                System.out.println("release: adding neg edge at: " + event.getX() + ", " + event.getY());
+                System.out.println("release: adding neg edge at: " + event.getX());
             }
         }
+        print_edges();
+    }
 
-        System.out.println(super.d_sig.pos_edges.size() + " pos edges");
-        System.out.println(super.d_sig.neg_edges.size() + " neg edges");
-        System.out.println("first pos: " + super.d_sig.pos_edges.get(0));
-        System.out.println("first neg: " + super.d_sig.neg_edges.get(0));
+    private void print_edges() {
+        System.out.println(super.d_sig.pos_edges.size() + " pos edges:");
+        for (int i = 0; i < super.d_sig.pos_edges.size(); i++) {
+            System.out.println(super.d_sig.pos_edges.get(i));
+        }
+
+        System.out.println(super.d_sig.neg_edges.size() + " neg edges:");
+        for (int i = 0; i < super.d_sig.neg_edges.size(); i++) {
+            System.out.println(super.d_sig.neg_edges.get(i));
+        }
     }
 }

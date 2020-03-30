@@ -36,6 +36,7 @@ class DSignal {
     protected Direction initial_direction;
 
     // event handling
+    protected boolean release_edge_pos;
     private MousePressHandler press_handler;
     private MouseDragHandler drag_handler;
     private MouseReleaseHandler release_handler;
@@ -68,6 +69,7 @@ class DSignal {
         erase_edge = false;
         h_line_position = H_Position.LOW;
         // event handling
+        release_edge_pos = false;
         press_handler = new MousePressHandler(this);
         drag_handler = new MouseDragHandler(this);
         release_handler = new MouseReleaseHandler(this);
