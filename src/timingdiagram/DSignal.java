@@ -79,7 +79,6 @@ class DSignal {
     }
 
     HBox draw() { // initializes all elements required for DSignal, including buttons, canvas, event handlers, etc.
-        Button delete_signal = new Button("X");
         TextField name = new TextField("Signal_Name");
 
         // style the pane instead of the canvas
@@ -87,9 +86,9 @@ class DSignal {
         signalPane.setPrefSize(canvas_width, height);
         init_line();
 
-        HBox diagram = new HBox(delete_signal, name, signalPane);
+        HBox diagram = new HBox(name, signalPane);
 
-        diagram.setPadding(new Insets(10));
+//        diagram.setPadding(new Insets(10));
         diagram.setSpacing(5);
         diagram.setAlignment(Pos.BOTTOM_CENTER);
 
