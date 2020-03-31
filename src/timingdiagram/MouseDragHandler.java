@@ -53,6 +53,20 @@ public class MouseDragHandler extends Handler {
         }
         draw_horizontal((int) event.getX(), super.d_sig.current_edge, super.d_sig.current_direction);
 
+        // FIXME: delete edges from initial to current
+
+//            int left = idx_left(press, 'p');
+//            int right = idx_right(release, 'p');
+//            if (left != -1 && right != -1) {
+//                super.d_sig.pos_edges.subList(left, right).clear();
+//            }
+//
+//            left = idx_left(press, 'n');
+//            right = idx_right(release, 'n');
+//            if (left != -1 && right != -1) {
+//                super.d_sig.neg_edges.subList(left, right).clear();
+//            }
+
         super.d_sig.previous_direction = super.d_sig.current_direction;
         super.d_sig.prev_mouse_coord = (int)event.getX();
     }
