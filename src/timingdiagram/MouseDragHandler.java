@@ -161,9 +161,6 @@ public class MouseDragHandler extends Handler {
             right += 1; // note: subList(fromIndex, toIndex) method is inclusive for fromIndex and exclusive for toIndex
             super.d_sig.pos_edges.subList(left, right).clear();
         }
-//        else {
-//            System.out.println("left pos: " + left + " right pos: " + right);
-//        }
     }
 
     private void clear_neg(int left, int right) {
