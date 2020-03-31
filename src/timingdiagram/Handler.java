@@ -1,7 +1,6 @@
 package timingdiagram;
 
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 
 abstract class Handler {
@@ -22,48 +21,45 @@ abstract class Handler {
         d_sig.gc.stroke();
     }
 
-    boolean in_between_edges(int coord) { // TODO: fix this
+    boolean in_between_edges(int coord) { // FIXME: not correct when direction changing from left to right
         boolean pos_empty = d_sig.pos_edges.size() == 0;
-        boolean neg_empty = d_sig.neg_edges.size() == 0;
         boolean drawing_high = d_sig.h_line_position == DSignal.H_Position.HIGH;
-        boolean drawing_low = d_sig.h_line_position == DSignal.H_Position.LOW;
 
-        if (pos_empty && neg_empty) { // no edges
-            if (drawing_low) {
-                System.out.println("neg edge on initial");
-                return true;
+        int cur_pos;
+        int cur_neg;
+
+        if (drawing_high) {
+            if (pos_empty && edges_balanced()) { // means there is only a low signal
+                return false;
             }
-            return false;
-        }
-        else {
-            if (drawing_low && !pos_empty && coord < d_sig.pos_edges.get(0)) { // low signal before first positive edge\
-//                System.out.println("low sig before 1st pos edge");
-                return true;
-            }
-            for (int i = 0; (i < d_sig.pos_edges.size() && (i < d_sig.neg_edges.size())); i++) {
-//                if (!edges_balanced()) {
-//                    return false;
-//                }
-                if (drawing_high && edges_balanced()) { // avoid the case where we are "in between" because we haven't finished adding an edge through dragging
-                    if ((coord >= d_sig.pos_edges.get(i)) && (coord <= d_sig.neg_edges.get(i))) { // positive edge placement on high signal
-//                        System.out.println("pos edge on high signal: in between " + d_sig.pos_edges.get(i) + "," + d_sig.neg_edges.get(i));
+            if (edges_balanced()) { // closing edge only exists if edges are balanced
+                for (int i = 0; i < d_sig.pos_edges.size(); i++) { // each i contains corresponding positive edge, then negative
+                    cur_pos = d_sig.pos_edges.get(i);
+                    cur_neg = d_sig.neg_edges.get(i);
+                    if (cur_pos <= coord && coord <= cur_neg) {
                         return true;
                     }
                 }
-                else if (drawing_low && edges_balanced()){
-//                    System.out.println("neg i: " + d_sig.neg_edges.get(i) + ", pos i: " + d_sig.pos_edges.get(i) + ", coord: " + coord);
-//                    System.out.println("edges balanced: " + edges_balanced());
-                    if (coord >= d_sig.neg_edges.get(i)) { // after last negative edge
-                        if (i + 1 >= d_sig.pos_edges.size()) { // no more pos edges
-//                            System.out.println("no more pos edges");
+            }
+        }
+        else { // drawing low
+            if (pos_empty && edges_balanced()) { // pos can be empty with edges unbalanced when erasing a positive edge
+                return true;
+            }
+            if (edges_balanced()) {
+                if (coord <= d_sig.pos_edges.get(0)) { // before first pos edge
+                    return true;
+                }
+                for (int i = 0; i < d_sig.neg_edges.size(); i++) { // neg edge at i, then to close the low signal, corresponding pos is at i + 1
+                    cur_neg = d_sig.neg_edges.get(i);
+                    if (coord >= cur_neg) {
+                        if (i + 1 >= d_sig.pos_edges.size()) { // after last negative edge
                             return true;
                         }
-                        if (coord <= d_sig.pos_edges.get(i + 1)) { // high signal starts after coord
-//                            System.out.println("high signal starts later");
+                        cur_pos = d_sig.pos_edges.get(i + 1);
+                        if (coord <= cur_pos) {
                             return true;
                         }
-//                        System.out.println("neg edge on low signal: in between " + d_sig.pos_edges.get(i) + "," + d_sig.neg_edges.get(i));
-                        return true;
                     }
                 }
             }
