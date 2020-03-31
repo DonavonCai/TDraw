@@ -1,7 +1,6 @@
 package timingdiagram;
 
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 
 abstract class Handler {

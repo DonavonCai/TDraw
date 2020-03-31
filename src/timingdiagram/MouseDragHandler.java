@@ -36,8 +36,8 @@ public class MouseDragHandler extends Handler {
                         Collections.sort(super.d_sig.neg_edges);
                         System.out.println("num neg: " + super.d_sig.neg_edges.size());
                     }
-                    else { // left to right
-                        System.out.println("pos edge");
+                    else if (d_sig.previous_direction == DSignal.Direction.LEFT){ // left to right
+                        System.out.println("dir change: pos edge");
                         super.d_sig.pos_edges.add(d_sig.current_edge);
                         Collections.sort(super.d_sig.pos_edges);
                     }
