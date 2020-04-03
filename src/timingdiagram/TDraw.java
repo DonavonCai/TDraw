@@ -11,9 +11,14 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 // event handling
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 
 public class TDraw extends Application {
+    // constants for styling
+    private final String IDLE_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #e0e0e0;";
+    private final String PRESSED_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #949494;";
+
+    // handlers
+    private SignalAddRemoveHandler signal_handler;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -24,25 +29,32 @@ public class TDraw extends Application {
         primaryStage.setTitle("TDraw");
         primaryStage.show();
 
-        Button add_signal_button = new Button("Add Signal");
-        EventHandler<ActionEvent> add_signal = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                // TODO: add new signal
-            }
-        };
-        add_signal_button.setOnAction(add_signal);
+        signal_handler = new SignalAddRemoveHandler();
 
-        DSignal initial_signal = new DSignal();
         Group root = new Group();
-        HBox buttons = new HBox(add_signal_button);
+
+        // initialize first signal + signal field
+        VBox signal_field = new VBox();
+        signal_handler.add_signal(signal_field);
+
+        // initialize add signal button
+        Button add_signal = new Button("Add Signal");
+        add_signal.setStyle(IDLE_BUTTON_STYLE);
+
+        add_signal.setOnMousePressed(e -> add_signal.setStyle(PRESSED_BUTTON_STYLE));
+        add_signal.setOnMouseReleased(e -> add_signal.setStyle(IDLE_BUTTON_STYLE));
+
+        add_signal.setOnAction((ActionEvent event) -> { // functionality for adding new signals
+            signal_handler.add_signal(signal_field);
+        });
+
+        HBox buttons = new HBox(add_signal);
         buttons.setPadding(new Insets(10));
-        VBox diagrams = new VBox(initial_signal.draw());
 
-        VBox document = new VBox(buttons, diagrams);
+        VBox page = new VBox(buttons, signal_field);
+        root.getChildren().add(page);
 
-        root.getChildren().add(document);
-
-        Scene diagram = new Scene(root, 800, 400);
+        Scene diagram = new Scene(root, 900, 500);
         primaryStage.setScene(diagram);
     }
 }

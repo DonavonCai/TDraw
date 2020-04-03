@@ -1,12 +1,10 @@
 package timingdiagram;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -56,7 +54,7 @@ class DSignal {
         System.out.println("Signal created!");
         // layout
         height = 30;
-        canvas_width = 500;
+        canvas_width = 700;
         line_width = 3;
         signal = new Canvas(canvas_width, height);
         gc = signal.getGraphicsContext2D();
@@ -79,17 +77,19 @@ class DSignal {
     }
 
     HBox draw() { // initializes all elements required for DSignal, including buttons, canvas, event handlers, etc.
-        Button delete_signal = new Button("X");
         TextField name = new TextField("Signal_Name");
+        name.setStyle("-fx-background-color: white;");
+        name.setAlignment(Pos.BOTTOM_RIGHT);
+        name.setMaxWidth(100.0);
 
         // style the pane instead of the canvas
         Pane signalPane = new Pane(signal);
         signalPane.setPrefSize(canvas_width, height);
         init_line();
 
-        HBox diagram = new HBox(delete_signal, name, signalPane);
+        HBox diagram = new HBox(name, signalPane);
 
-        diagram.setPadding(new Insets(10));
+//        diagram.setPadding(new Insets(10));
         diagram.setSpacing(5);
         diagram.setAlignment(Pos.BOTTOM_CENTER);
 
