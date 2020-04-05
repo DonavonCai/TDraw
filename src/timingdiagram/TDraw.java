@@ -10,7 +10,10 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 // event handling
 import javafx.event.ActionEvent;
-// pdf
+// pdf saving
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.MenuBar;
 import javafx.scene.image.WritableImage;
 import javafx.scene.SnapshotParameters;
 import javafx.embed.swing.SwingFXUtils;
@@ -18,7 +21,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import javafx.stage.FileChooser;
 import java.io.IOException;
-
+// icon
 import javafx.scene.image.Image;
 
 public class TDraw extends Application {
@@ -47,11 +50,15 @@ public class TDraw extends Application {
         VBox signal_field = new VBox();
         signal_handler.add_signal(signal_field);
 
-        // initialize buttons
-        Button export_button = new Button("Export as PDF");
-        initialize_style(export_button);
+        // initialize menu
+        Menu m = new Menu("File");
+        MenuItem export_as_pdf = new MenuItem("Export as PDF");
+        m.getItems().add(export_as_pdf);
+        MenuBar mb = new MenuBar();
+        mb.prefWidthProperty().bind(primaryStage.widthProperty());
+        mb.getMenus().add(m);
 
-        export_button.setOnAction((ActionEvent event) -> {
+        export_as_pdf.setOnAction((ActionEvent event) -> {
             System.out.println("saving!");
             WritableImage image = signal_field.snapshot(new SnapshotParameters(), null);
             FileChooser fileChooser = new FileChooser();
@@ -64,7 +71,7 @@ public class TDraw extends Application {
                 ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
             } catch (IOException e) {
                 System.out.println("Failed to save.");
-                return;
+                System.exit(0);
             }
         });
 
@@ -75,11 +82,11 @@ public class TDraw extends Application {
             signal_handler.add_signal(signal_field);
         });
 
-        VBox buttons = new VBox(export_button, add_signal);
+        VBox buttons = new VBox(add_signal);
         buttons.setPadding(new Insets(10));
         buttons.setSpacing(10.0);
 
-        VBox page = new VBox(buttons, signal_field);
+        VBox page = new VBox(mb, buttons, signal_field);
         root.getChildren().add(page);
 
         Scene diagram = new Scene(root, 900, 500);
