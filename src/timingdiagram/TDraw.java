@@ -19,6 +19,8 @@ import java.io.File;
 import javafx.stage.FileChooser;
 import java.io.IOException;
 
+import javafx.scene.image.Image;
+
 public class TDraw extends Application {
     // constants for styling
     private final String IDLE_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #e0e0e0;";
@@ -34,6 +36,7 @@ public class TDraw extends Application {
     public void start(Stage primaryStage) {
         System.out.println("Java fx running");
         primaryStage.setTitle("TDraw");
+        primaryStage.getIcons().add(new Image("img/logo.jpg"));
         primaryStage.show();
 
         signal_handler = new SignalAddRemoveHandler();
