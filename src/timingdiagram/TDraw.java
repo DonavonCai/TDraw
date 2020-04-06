@@ -5,7 +5,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 // padding, spacing, layout
 import javafx.geometry.Insets;
@@ -41,7 +40,7 @@ public class TDraw extends Application {
     public void start(Stage primaryStage) {
         System.out.println("Java fx running");
         primaryStage.setTitle("TDraw");
-        primaryStage.getIcons().add(new Image("img/logo.jpg"));
+        primaryStage.getIcons().add(new Image("timingdiagram/logo.jpg"));
         primaryStage.show();
 
         signal_handler = new SignalAddRemoveHandler();
