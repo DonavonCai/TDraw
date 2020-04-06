@@ -1,6 +1,8 @@
 # Instructions For Download
 You will need at least Java 8 installed to run this program, which you can find here: https://www.java.com/en/download/
 
+Downloads can be found in the Releases tab.
+
 Windows - Download TDraw.exe and run.
 
 Mac OS - Download TDraw.jar and run. It is possible that you may need to run with admin privileges to start.
