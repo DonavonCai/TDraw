@@ -23,7 +23,7 @@ public class MousePressHandler extends Handler {
                 super.draw_vertical((int) event.getX());
                 super.d_sig.pos_edges.add(super.d_sig.current_edge);
                 Collections.sort(super.d_sig.pos_edges);
-                System.out.println("adding positive edge at: " + super.d_sig.current_edge);
+//                System.out.println("adding positive edge at: " + super.d_sig.current_edge);
             }
         }
         else if (event.getButton() == MouseButton.SECONDARY) {
@@ -36,7 +36,7 @@ public class MousePressHandler extends Handler {
                 super.draw_vertical((int) event.getX());
                 super.d_sig.neg_edges.add(super.d_sig.current_edge);
                 Collections.sort(super.d_sig.neg_edges);
-                System.out.println("adding negative edge at: " + super.d_sig.current_edge);
+//                System.out.println("adding negative edge at: " + super.d_sig.current_edge);
             }
         }
     }
