@@ -63,6 +63,9 @@ public class SignalAddRemoveHandler {
         // set user data to be retrieved later
         signal_container.setUserData(index);
         delete_signal.setUserData(index);
+
+        signal_container.setAlignment(Pos.CENTER_LEFT);
+        signal_container.setPadding(new Insets(10));
         index++;
 
         return signal_container;

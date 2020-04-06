@@ -5,9 +5,11 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-// padding, spacing, etc
+// padding, spacing, layout
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 // event handling
 import javafx.event.ActionEvent;
 // pdf saving
@@ -47,8 +49,8 @@ public class TDraw extends Application {
         Group root = new Group();
 
         // initialize first signal + signal field
-        VBox signal_field = new VBox();
-        signal_handler.add_signal(signal_field);
+        VBox signal_field_wrapper = new VBox();
+        signal_handler.add_signal(signal_field_wrapper);
 
         // initialize menu
         Menu m = new Menu("File");
@@ -60,7 +62,7 @@ public class TDraw extends Application {
 
         export_as_pdf.setOnAction((ActionEvent event) -> {
             System.out.println("saving!");
-            WritableImage image = signal_field.snapshot(new SnapshotParameters(), null);
+            WritableImage image = signal_field_wrapper.snapshot(new SnapshotParameters(), null);
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save diagram to...");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
@@ -75,18 +77,21 @@ public class TDraw extends Application {
             }
         });
 
+        // initialize buttons
         Button add_signal = new Button("Add Signal");
         initialize_style(add_signal);
 
         add_signal.setOnAction((ActionEvent event) -> {
-            signal_handler.add_signal(signal_field);
+            signal_handler.add_signal(signal_field_wrapper);
         });
 
+        // layout
         VBox buttons = new VBox(add_signal);
         buttons.setPadding(new Insets(10));
         buttons.setSpacing(10.0);
 
-        VBox page = new VBox(mb, buttons, signal_field);
+        VBox page = new VBox(mb, buttons, signal_field_wrapper);
+        page.setAlignment(Pos.BASELINE_LEFT);
         root.getChildren().add(page);
 
         Scene diagram = new Scene(root, 900, 500);

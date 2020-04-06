@@ -89,7 +89,6 @@ class DSignal {
 
         HBox diagram = new HBox(name, signalPane);
 
-//        diagram.setPadding(new Insets(10));
         diagram.setSpacing(5);
         diagram.setAlignment(Pos.BOTTOM_CENTER);
 
@@ -131,8 +130,4 @@ class DSignal {
         gc.stroke();
         gc.stroke(); // second stroke makes it more solid for some reason??? just leave it in until you figure out why
     }
-
-
-
-
 }
