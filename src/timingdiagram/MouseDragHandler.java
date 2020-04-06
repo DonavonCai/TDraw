@@ -31,25 +31,25 @@ public class MouseDragHandler extends Handler {
 //                System.out.println("dir change: adding edge at: " + super.d_sig.current_edge);
                 if (event.getButton() == MouseButton.PRIMARY) {
                     if (d_sig.previous_direction == DSignal.Direction.RIGHT) { // right to left
-                        System.out.println("neg edge");
+//                        System.out.println("neg edge");
                         super.d_sig.neg_edges.add(d_sig.current_edge);
                         Collections.sort(super.d_sig.neg_edges);
-                        System.out.println("num neg: " + super.d_sig.neg_edges.size());
+//                        System.out.println("num neg: " + super.d_sig.neg_edges.size());
                     }
                     else if (d_sig.previous_direction == DSignal.Direction.LEFT){ // left to right
-                        System.out.println("dir change: pos edge");
+//                        System.out.println("dir change: pos edge");
                         super.d_sig.pos_edges.add(d_sig.current_edge);
                         Collections.sort(super.d_sig.pos_edges);
                     }
                 }
                 else if (event.getButton() == MouseButton.SECONDARY) {
                     if (d_sig.previous_direction == DSignal.Direction.RIGHT) { // right to left
-                        System.out.println("pos edge");
+//                        System.out.println("pos edge");
                         super.d_sig.pos_edges.add(d_sig.current_edge);
                         Collections.sort(super.d_sig.pos_edges);
                     }
                     else { // left to right
-                        System.out.println("neg edge");
+//                        System.out.println("neg edge");
                         super.d_sig.neg_edges.add(d_sig.current_edge);
                         Collections.sort(super.d_sig.neg_edges);
                     }
@@ -77,7 +77,7 @@ public class MouseDragHandler extends Handler {
             if (event.getButton() == MouseButton.PRIMARY) {
                 if (!in_between_edges(super.d_sig.initial_edge)) {
                     // change initial from positive to negative (if moving left, press handler will have assumed a positive edge placement, but it should be negative, and is corrected here)
-                    System.out.println("switching pos and neg");
+//                    System.out.println("switching pos and neg");
                     super.d_sig.neg_edges.add(super.d_sig.initial_edge);
                     super.d_sig.pos_edges.remove(Integer.valueOf(super.d_sig.initial_edge)); // valueOf returns an Integer object so that we remove by value instead of index
                     Collections.sort(super.d_sig.neg_edges);
@@ -87,7 +87,7 @@ public class MouseDragHandler extends Handler {
             else if (event.getButton() == MouseButton.SECONDARY) {
                 if (!in_between_edges(super.d_sig.initial_edge)) {
                     // change initial from negative to positive
-                    System.out.println("switching neg and neg");
+//                    System.out.println("switching neg and neg");
                     super.d_sig.pos_edges.add(super.d_sig.initial_edge);
                     super.d_sig.neg_edges.remove(Integer.valueOf(super.d_sig.initial_edge)); // valueOf returns an Integer object so that we remove by value instead of index
                     Collections.sort(super.d_sig.pos_edges);
@@ -142,7 +142,7 @@ public class MouseDragHandler extends Handler {
                 super.d_sig.release_edge_pos = true;
             }
             else if (event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("release negative");
+//                System.out.println("release negative");
                 super.d_sig.release_edge_pos = false;
             }
             left_pos = first_idx_greater_than(curr, 'p');
@@ -157,7 +157,7 @@ public class MouseDragHandler extends Handler {
 
     private void clear_pos(int left, int right) {
         if (left != -1 && right != -1 && left <= right) {
-            System.out.println("removing pos from i: " + left + ": " + super.d_sig.pos_edges.get(left) + " to " + right + ": " + super.d_sig.pos_edges.get(right));
+//            System.out.println("removing pos from i: " + left + ": " + super.d_sig.pos_edges.get(left) + " to " + right + ": " + super.d_sig.pos_edges.get(right));
             right += 1; // note: subList(fromIndex, toIndex) method is inclusive for fromIndex and exclusive for toIndex
             super.d_sig.pos_edges.subList(left, right).clear();
         }
@@ -165,10 +165,10 @@ public class MouseDragHandler extends Handler {
 
     private void clear_neg(int left, int right) {
         if (left != -1 && right != -1 && left <= right) {
-            System.out.println("removing neg from i: " + left + ": " + super.d_sig.neg_edges.get(left) + " to " + right + ": " + super.d_sig.neg_edges.get(right));
+//            System.out.println("removing neg from i: " + left + ": " + super.d_sig.neg_edges.get(left) + " to " + right + ": " + super.d_sig.neg_edges.get(right));
             right += 1;
             super.d_sig.neg_edges.subList(left, right).clear();
-            System.out.println("size is now: " + super.d_sig.neg_edges.size());
+//            System.out.println("size is now: " + super.d_sig.neg_edges.size());
         }
     }
 

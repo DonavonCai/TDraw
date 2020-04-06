@@ -51,7 +51,7 @@ class DSignal {
     protected ArrayList<Integer> neg_edges;
 
     DSignal() {
-        System.out.println("Signal created!");
+//        System.out.println("Signal created!");
         // layout
         height = 30;
         canvas_width = 700;
