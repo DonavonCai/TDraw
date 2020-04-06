@@ -5,6 +5,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 // padding, spacing, layout
 import javafx.geometry.Insets;
@@ -43,13 +44,12 @@ public class TDraw extends Application {
         primaryStage.getIcons().add(new Image("timingdiagram/logo.jpg"));
         primaryStage.show();
 
-        signal_handler = new SignalAddRemoveHandler();
-
         Group root = new Group();
 
         // initialize first signal + signal field
-        VBox signal_field_wrapper = new VBox();
-        signal_handler.add_signal(signal_field_wrapper);
+        HBox signal_field_wrapper = new HBox();
+        signal_handler = new SignalAddRemoveHandler(signal_field_wrapper);
+        signal_handler.add_signal();
 
         // initialize menu
         Menu m = new Menu("File");
@@ -61,7 +61,8 @@ public class TDraw extends Application {
 
         export_as_pdf.setOnAction((ActionEvent event) -> {
             System.out.println("saving!");
-            WritableImage image = signal_field_wrapper.snapshot(new SnapshotParameters(), null);
+            VBox signal_field_only = signal_handler.get_signal_box();
+            WritableImage image = signal_field_only.snapshot(new SnapshotParameters(), null);
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save diagram to...");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
@@ -81,7 +82,7 @@ public class TDraw extends Application {
         initialize_style(add_signal);
 
         add_signal.setOnAction((ActionEvent event) -> {
-            signal_handler.add_signal(signal_field_wrapper);
+            signal_handler.add_signal();
         });
 
         // layout
@@ -91,6 +92,7 @@ public class TDraw extends Application {
 
         VBox page = new VBox(mb, buttons, signal_field_wrapper);
         page.setAlignment(Pos.BASELINE_LEFT);
+        page.setSpacing(10);
         root.getChildren().add(page);
 
         Scene diagram = new Scene(root, 900, 500);

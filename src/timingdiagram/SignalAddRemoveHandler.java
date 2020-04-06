@@ -15,33 +15,39 @@ public class SignalAddRemoveHandler {
     private final String PRESSED_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #949494;";
 
     // note: userData for buttons and containers is based on num_signals
-    private VBox signal_field;
+    private HBox complete_box;
     private ArrayList<Button> buttons;
     private ArrayList<HBox> containers;
 
-    private int index;
+    private VBox signal_box;
+    private VBox button_box;
 
-    SignalAddRemoveHandler() {
+    private int index;
+    private final String SIGNAL_BOX_USERDATA = "signalBox";
+
+    SignalAddRemoveHandler(HBox sig) {
         System.out.println("signal handler created");
+        complete_box = sig;
+        signal_box = new VBox();
+        signal_box.setUserData(SIGNAL_BOX_USERDATA);
+        button_box = new VBox();
+        complete_box.getChildren().add(button_box);
+        complete_box.getChildren().add(signal_box);
+
+        button_box.setSpacing(24);
+        button_box.setAlignment(Pos.CENTER_LEFT);
+        signal_box.setAlignment(Pos.BOTTOM_CENTER);
+        complete_box.setPadding(new Insets(10));
+
         buttons = new ArrayList<Button>();
         containers = new ArrayList<HBox>();
         index = 0;
     }
 
-    void add_signal(VBox signal_field) {
-        this.signal_field = signal_field;
-        HBox new_signal_container = draw_new_signal_container();
-        signal_field.getChildren().add(new_signal_container);
-    }
+    protected VBox get_signal_box() {return signal_box;}
 
-    void remove_signal(Button b) {
-        Integer i = (int)b.getUserData();
-        System.out.println("i: " + i);
-        HBox container_to_remove = containers.get(i);
-        this.signal_field.getChildren().remove(container_to_remove);
-    }
-
-    private HBox draw_new_signal_container() {
+    protected void add_signal() {
+        // add button
         Button delete_signal = new Button("X");
         delete_signal.setStyle(IDLE_BUTTON_STYLE);
         delete_signal.setOnMousePressed(e-> delete_signal.setStyle(PRESSED_BUTTON_STYLE));
@@ -52,12 +58,18 @@ public class SignalAddRemoveHandler {
             remove_signal(delete_signal);
         });
 
+        button_box.getChildren().add(delete_signal);
+
+        // add signal
         DSignal signal = new DSignal();
-        HBox signal_container = new HBox(delete_signal, signal.draw());
+        HBox signal_container = new HBox(signal.draw());
         signal_container.setPadding(new Insets(10));
         signal_container.setSpacing(5);
         signal_container.setAlignment(Pos.BOTTOM_CENTER);
 
+        signal_box.getChildren().add(signal_container);
+
+        // track index
         buttons.add(delete_signal);
         containers.add(signal_container);
         // set user data to be retrieved later
@@ -67,7 +79,14 @@ public class SignalAddRemoveHandler {
         signal_container.setAlignment(Pos.CENTER_LEFT);
         signal_container.setPadding(new Insets(10));
         index++;
+    }
 
-        return signal_container;
+    protected void remove_signal(Button b) {
+        Integer i = (int)b.getUserData();
+        System.out.println("i: " + i);
+        HBox container_to_remove = containers.get(i);
+        Button button_to_remove = buttons.get(i);
+        signal_box.getChildren().remove(container_to_remove);
+        button_box.getChildren().remove(button_to_remove);
     }
 }
