@@ -20,11 +20,11 @@ class DSignal {
     public enum H_Position{HIGH, LOW}
 
     // layout
-    protected int height;
-    protected int canvas_width;
-    protected int line_width;
-    private Canvas signal;
-    protected GraphicsContext gc;
+    protected final int height;
+    protected final int canvas_width;
+    protected final int line_width;
+    private final Canvas signal;
+    protected final GraphicsContext gc;
 
     // direction checking
     protected int prev_mouse_coord;
@@ -35,23 +35,18 @@ class DSignal {
 
     // event handling
     protected boolean release_edge_pos;
-    private MousePressHandler press_handler;
-    private MouseDragHandler drag_handler;
-    private MouseReleaseHandler release_handler;
-
-    protected void setPressHandler(MousePressHandler m) {press_handler = m;}
-    protected void setDragHandler(MouseDragHandler m) {drag_handler = m;}
-    protected void setReleaseHandler(MouseReleaseHandler m) {release_handler = m;}
+    private final MousePressHandler press_handler;
+    private final MouseDragHandler drag_handler;
+    private final MouseReleaseHandler release_handler;
 
     // edge tracking
     protected int current_edge;
     protected int initial_edge;
-    protected boolean erase_edge;
-    protected ArrayList<Integer> pos_edges;
-    protected ArrayList<Integer> neg_edges;
+//    protected boolean erase_edge;
+    protected final ArrayList<Integer> pos_edges;
+    protected final ArrayList<Integer> neg_edges;
 
     DSignal() {
-//        System.out.println("Signal created!");
         // layout
         height = 30;
         canvas_width = 700;
@@ -64,7 +59,6 @@ class DSignal {
         previous_direction = Direction.NULL;
         current_direction = Direction.NULL;
         initial_direction = Direction.NULL;
-        erase_edge = false;
         h_line_position = H_Position.LOW;
         // event handling
         release_edge_pos = false;
@@ -93,7 +87,7 @@ class DSignal {
         diagram.setAlignment(Pos.BOTTOM_CENTER);
 
         signalPane.addEventHandler(MouseEvent.MOUSE_PRESSED,
-                new EventHandler<MouseEvent>() {
+                new EventHandler<>() {
                     @Override
                     public void handle(MouseEvent event) { // code is repeated to avoid event handling with mouse buttons other than left and right click
                         press_handler.handle(event);
@@ -102,7 +96,7 @@ class DSignal {
         );
 
         signalPane.addEventHandler(MouseEvent.MOUSE_DRAGGED,
-                new EventHandler<MouseEvent>() {
+                new EventHandler<>() {
                     @Override
                     public void handle(MouseEvent event) {
                         drag_handler.handle(event);
@@ -111,7 +105,7 @@ class DSignal {
         );
 
         signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
-                new EventHandler<MouseEvent>() {
+                new EventHandler<>() {
                     @Override
                     public void handle(MouseEvent event) {
                         release_handler.handle(event);
@@ -128,6 +122,6 @@ class DSignal {
         gc.moveTo(0, height);
         gc.lineTo(canvas_width, height);
         gc.stroke();
-        gc.stroke(); // second stroke makes it more solid for some reason??? just leave it in until you figure out why
+        gc.stroke(); // second stroke makes it more solid
     }
 }

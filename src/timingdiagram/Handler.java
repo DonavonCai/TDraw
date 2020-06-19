@@ -4,7 +4,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 abstract class Handler {
-    protected DSignal d_sig;
+    protected final DSignal d_sig;
 
     Handler(DSignal d) {
         d_sig = d;

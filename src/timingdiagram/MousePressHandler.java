@@ -16,7 +16,7 @@ public class MousePressHandler extends Handler {
         if (event.getButton() == MouseButton.PRIMARY) {
             super.d_sig.previous_direction = DSignal.Direction.NULL;
             super.d_sig.h_line_position = DSignal.H_Position.HIGH;
-            super.d_sig.erase_edge = false;
+//            super.d_sig.erase_edge = false;
             super.d_sig.initial_edge = (int)event.getX();
             super.d_sig.current_edge = (int) event.getX();
             if (!super.in_between_edges((int)event.getX())) {
@@ -29,7 +29,7 @@ public class MousePressHandler extends Handler {
         else if (event.getButton() == MouseButton.SECONDARY) {
             super.d_sig.previous_direction = DSignal.Direction.NULL;
             super.d_sig.h_line_position = DSignal.H_Position.LOW;
-            super.d_sig.erase_edge = false;
+//            super.d_sig.erase_edge = false;
             super.d_sig.initial_edge = (int)event.getX();
             super.d_sig.current_edge = (int) event.getX();
             if (!super.in_between_edges((int)event.getX())) {
