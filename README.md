@@ -1,23 +1,25 @@
-# TDraw
-## Overview
-This software is used to draw timing diagrams consisting of multiple named signals.
+# Instructions For Download
+You will need at least Java 8 installed to run this program, which you can find here: https://www.java.com/en/download/
 
-## Specifications / Features
-* Can edit a signal to add positive and negative edges.
-* Can add and remove signals
-* Can rename signals
+Downloads can be found in the Releases tab.
 
-## Documentation / Classes
+Windows - Download TDraw.exe and run.
 
-### TDraw
-This class contains the main() function and is responsible for launching the program. In addition, this class handles the layout of all other classes on the page.
+Mac OS - Download TDraw.jar and run. It is possible that you may need to run from terminal with admin privileges to start.
 
-### DSignal
-This class contains individual signals and their respective elements, such as buttons and labels. On left click, it will place a positive edge, and on right click, a negative edge. When the mouse is dragged, the respective high or low signal will be extended.
+# How to use
+Simply left click to draw a high signal, right click to draw a low signal. When you are done, File > Export as PDF and choose a directory and the program will save your diagram as a PNG file.
 
-The DSignal class has 3 event listeners for mouse events: press, drag, and release.
-* On press: A positive or negative edge is placed if applicable.
-* On drag: The respective high or low signal is extended from the initial click in the direction of the mouse drag. The "closing" edge is continuously redrawn at the current coordinates of the mouse. Previous drawings of the closing edge, now obsolete, are drawn over with a white rectangle.
-* On release: The closing edge is finalized and any variables needed for direction checking are reset if necessary.
+# Documentation
 
-### UML Diagrams
+## Classes:
+
+### TDraw:
+
+This class launches the application, and is the primary class responsible for the layout of the page. It contains a menu bar and some buttons. It also contains a Scene 'diagram' which contains a number of DSignals which can be dynamically added and removed.
+
+### DSignal:
+
+The DSignal class holds all information necessary for an individual signal. This class contains handlers for mouse clicking, dragging, and releasing.
+
+## UML Diagram:
