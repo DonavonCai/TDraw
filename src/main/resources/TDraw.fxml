@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.Label?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Button?>
+
+
+<?import javafx.scene.canvas.Canvas?>
+<Group xmlns:fx="http://javafx.com/fxml" fx:id="root" fx:controller="timingdiagram.FXMLController">
+    <VBox fx:id="page">
+        <MenuBar prefWidth="${page.width}">
+            <menus>
+                <Menu text="File">
+                    <MenuItem fx:id="export_as_png" text="export as PNG"></MenuItem>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <VBox fx:id="buttons" minWidth="100" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-spacing: 24; -fx-border-color: blue">
+            <Button text="add signal"></Button>
+        </VBox>
+        <HBox fx:id="signalWrapper" style="-fx-border-color: purple; -fx-spacing: 20">
+            <VBox fx:id="button_box" style="-fx-padding: 10">
+                <Button fx:id="delete_signal" text="X" minWidth="25" alignment="CENTER" style="-fx-padding: 5"></Button>
+            </VBox>
+            <VBox fx:id="si gnal_field" alignment="BOTTOM_CENTER" style="-fx-border-color: red">
+                <Pane prefWidth="700" prefHeight="30">
+                    <Canvas></Canvas>
+                </Pane>
+                <Label text="hello world"></Label>
+            </VBox>
+        </HBox>
+    </VBox>
+</Group>
