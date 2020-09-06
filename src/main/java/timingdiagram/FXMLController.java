@@ -3,6 +3,7 @@ package timingdiagram;
 // Layout
 import javafx.scene.Group;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
@@ -20,7 +21,7 @@ import javafx.scene.SnapshotParameters;
 import static java.lang.System.exit;
 
 public class FXMLController {
-    // FXML components: -------------------------------------
+    // UI components: ---------------------------------------
     @FXML
     private Group root;
     @FXML
@@ -28,10 +29,16 @@ public class FXMLController {
     @FXML
     private MenuItem export_as_png;
     @FXML
-    private VBox signal_field;
+    private VBox buttons;
 
     private Stage primaryStage;
+    // ------------------------------------------------------
+    // Helper classes: --------------------------------------
+    @FXML
+    private AddRemoveController addRemoveController;
+    // ======================================================
 
+    // Interface: -------------------------------------------
     public void initialize() {
         System.out.println("FXML controller initialized");
         initMenuEvents();
@@ -41,11 +48,11 @@ public class FXMLController {
         primaryStage = s;
         page.prefWidthProperty().bind(s.widthProperty());
     }
-
+    // ------------------------------------------------------
+    // Helper Functions: ------------------------------------
     private void initMenuEvents() {
         export_as_png.setOnAction((ActionEvent event) -> {
-            VBox signal_field_only = signal_field;
-            WritableImage image = signal_field_only.snapshot(new SnapshotParameters(), null);
+            WritableImage image = addRemoveController.get_signal_box().snapshot(new SnapshotParameters(), null);
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save diagram to...");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
@@ -58,5 +65,12 @@ public class FXMLController {
                 System.out.println("Failed to save.");
             }
         });
+    }
+    // ------------------------------------------------------
+    // Functions called in .fxml files ----------------------
+    @FXML
+    private void addSignal() {
+        System.out.println("add signal");
+        addRemoveController.add_signal();
     }
 }

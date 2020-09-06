@@ -34,9 +34,6 @@ public class TDraw extends Application {
     private final String IDLE_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #e0e0e0;";
     private final String PRESSED_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #949494;";
 
-    // handlers
-    private SignalAddRemoveHandler signal_handler;
-
     public static void main(String[] args) {
         Application.launch(args);
     }
