@@ -23,45 +23,50 @@ abstract class Handler {
         d_sig.gc.stroke();
     }
 
-    boolean in_between_edges(int coord) { // FIXME: incorrect when releasing left click in middle of high signal
+    // returns true if coord is in between 2 pairs of edges that form a high signal
+    boolean in_high_signal(int coord) {
         boolean pos_empty = d_sig.pos_edges.size() == 0;
-        boolean drawing_high = (directionTracker.get_hpos() == DirectionTracker.H_Position.HIGH);
 
         int cur_pos;
         int cur_neg;
 
-        if (drawing_high) {
-            if (pos_empty && edges_balanced()) { // means there is only a low signal
-                return false;
-            }
-            if (edges_balanced()) { // closing edge only exists if edges are balanced
-                for (int i = 0; i < d_sig.pos_edges.size(); i++) { // each i contains corresponding positive edge, then negative
-                    cur_pos = d_sig.pos_edges.get(i);
-                    cur_neg = d_sig.neg_edges.get(i);
-                    if (cur_pos <= coord && coord <= cur_neg) {
-                        return true;
-                    }
+        if (pos_empty && edges_balanced()) { // means there is only a low signal
+            return false;
+        }
+        if (edges_balanced()) { // closing edge only exists if edges are balanced
+            for (int i = 0; i < d_sig.pos_edges.size(); i++) { // find the pair of edges surrounding the edge to be added
+                cur_pos = d_sig.pos_edges.get(i);
+                cur_neg = d_sig.neg_edges.get(i);
+                if (cur_pos <= coord && coord <= cur_neg) {
+                    return true;
                 }
             }
         }
-        else { // drawing low
-            if (pos_empty && edges_balanced()) { // pos can be empty with edges unbalanced when erasing a positive edge
+        return false;
+    }
+
+    // returns true if coord is in the middle of a low signal
+    boolean in_low_signal(int coord) {
+        boolean pos_empty = d_sig.pos_edges.size() == 0;
+
+        int cur_pos;
+        int cur_neg;
+        if (pos_empty && edges_balanced()) { // pos can be empty with edges unbalanced when erasing a positive edge
+            return true;
+        }
+        if (edges_balanced()) {
+            if (coord <= d_sig.pos_edges.get(0)) { // before first pos edge
                 return true;
             }
-            if (edges_balanced()) {
-                if (coord <= d_sig.pos_edges.get(0)) { // before first pos edge
-                    return true;
-                }
-                for (int i = 0; i < d_sig.neg_edges.size(); i++) { // neg edge at i, then to close the low signal, corresponding pos is at i + 1
-                    cur_neg = d_sig.neg_edges.get(i);
-                    if (coord >= cur_neg) {
-                        if (i + 1 >= d_sig.pos_edges.size()) { // after last negative edge
-                            return true;
-                        }
-                        cur_pos = d_sig.pos_edges.get(i + 1);
-                        if (coord <= cur_pos) {
-                            return true;
-                        }
+            for (int i = 0; i < d_sig.neg_edges.size(); i++) { // neg edge at i, corresponding pos edge is at i + 1
+                cur_neg = d_sig.neg_edges.get(i);
+                if (coord >= cur_neg) {
+                    if (i + 1 >= d_sig.pos_edges.size()) { // after last negative edge
+                        return true;
+                    }
+                    cur_pos = d_sig.pos_edges.get(i + 1);
+                    if (coord <= cur_pos) {
+                        return true;
                     }
                 }
             }

@@ -15,18 +15,19 @@ public class MouseDragHandler extends Handler {
 
     @Override
     public void handle(MouseEvent event) {
+        int coord = (int)event.getX();
         // get mouse direction
-        if (super.directionTracker.prev_mouse_coord > 0 && (int)event.getX() < super.directionTracker.prev_mouse_coord) { // moving left
+        if (super.directionTracker.prev_mouse_coord > 0 && coord < super.directionTracker.prev_mouse_coord) { // moving left
             set_moving_left(event);
         }
-        else if (super.directionTracker.prev_mouse_coord > 0 && (int)event.getX() > super.directionTracker.prev_mouse_coord) { // moving right
+        else if (super.directionTracker.prev_mouse_coord > 0 && coord > super.directionTracker.prev_mouse_coord) { // moving right
             set_moving_right(event);
         }
 
         if (super.directionTracker.current_direction != super.directionTracker.previous_direction && super.directionTracker.previous_direction != DirectionTracker.Direction.NULL) { // direction change
-            super.d_sig.current_edge = (int)event.getX();
+            super.d_sig.current_edge = coord;
 
-            if (!in_between_edges(super.d_sig.current_edge)) {
+            if (!in_high_signal(coord) && !in_low_signal(coord)) {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     if (directionTracker.previous_direction == DirectionTracker.Direction.RIGHT) { // right to left
                         super.d_sig.neg_edges.add(d_sig.current_edge);
@@ -50,24 +51,25 @@ public class MouseDragHandler extends Handler {
             }
         }
 
-        if (!super.in_between_edges((int)event.getX())) { // this vertical line is drawn over in draw_horizontal if mouse continues to be dragged
-            super.draw_vertical((int)event.getX());
+        if (!super.in_high_signal(coord) && !super.in_low_signal(coord)) { // vertical line is drawn over as mouse is dragged
+            super.draw_vertical(coord);
         }
-        draw_horizontal((int) event.getX(), super.d_sig.current_edge, super.directionTracker.current_direction);
+        draw_horizontal(coord, super.d_sig.current_edge, super.directionTracker.current_direction);
 
         clear_covered_edges(event);
 
         // update direction
         super.directionTracker.previous_direction = super.directionTracker.current_direction;
-        super.directionTracker.prev_mouse_coord = (int)event.getX();
+        super.directionTracker.prev_mouse_coord = coord;
     }
 
     // Helper functions: ----------------------------------------------------------------------
     private void set_moving_left(MouseEvent event) {
+        int coord = (int)event.getX();
         if (super.directionTracker.initial_direction == DirectionTracker.Direction.NULL) { // set initial direction
             super.directionTracker.initial_direction = DirectionTracker.Direction.LEFT;
             if (event.getButton() == MouseButton.PRIMARY) {
-                if (!in_between_edges(super.d_sig.initial_edge)) {
+                if (!in_high_signal(coord) && !in_low_signal(coord)) {
                     // change initial from positive to negative (if moving left, press handler will have assumed a positive edge placement, but it should be negative, and is corrected here)
                     super.d_sig.neg_edges.add(super.d_sig.initial_edge);
                     super.d_sig.pos_edges.remove(Integer.valueOf(super.d_sig.initial_edge)); // valueOf returns an Integer object so that we remove by value instead of index
@@ -76,7 +78,7 @@ public class MouseDragHandler extends Handler {
                 }
             }
             else if (event.getButton() == MouseButton.SECONDARY) {
-                if (!in_between_edges(super.d_sig.initial_edge)) {
+                if (!in_high_signal(coord) && !in_low_signal(coord)) {
                     // change initial from negative to positive
                     super.d_sig.pos_edges.add(super.d_sig.initial_edge);
                     super.d_sig.neg_edges.remove(Integer.valueOf(super.d_sig.initial_edge)); // valueOf returns an Integer object so that we remove by value instead of index

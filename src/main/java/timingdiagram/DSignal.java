@@ -15,9 +15,6 @@ import javafx.event.EventHandler;
 import java.util.ArrayList;
 
 class DSignal {
-    // enums
-//    public enum Direction {LEFT, RIGHT, NULL}
-//    public enum H_Position{HIGH, LOW}
     // layout
     protected final int height;
     protected final int canvas_width;

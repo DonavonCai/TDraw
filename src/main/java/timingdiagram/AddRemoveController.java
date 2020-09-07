@@ -60,7 +60,6 @@ public class AddRemoveController {
         });
 
         button_box.getChildren().add(delete_signal);
-        button_box.setStyle("-fx-border-color: purple");
 
         // add signal
         DSignal signal = new DSignal();

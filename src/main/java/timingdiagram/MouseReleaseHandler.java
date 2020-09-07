@@ -15,21 +15,22 @@ public class  MouseReleaseHandler extends Handler {
     public void handle(MouseEvent event) {
         super.directionTracker.reset();
 
-        if (in_between_edges((int)event.getX())) {
-            return;
-        }
-        System.out.println("adding edge");
-
         int release = (int)event.getX();
 
         if (event.getButton() == MouseButton.PRIMARY || event.getButton() == MouseButton.SECONDARY) {
-            if (super.d_sig.release_edge_pos) {
-                super.d_sig.pos_edges.add(release);
-                Collections.sort(super.d_sig.pos_edges);
+            if (super.d_sig.release_edge_pos) { // edge to be added is positive
+                if (!super.in_low_signal(release) && !super.in_high_signal(release)) {
+                    System.out.println("adding edge");
+                    super.d_sig.pos_edges.add(release);
+                    Collections.sort(super.d_sig.pos_edges);
+                }
             }
-            else {
-                super.d_sig.neg_edges.add(release);
-                Collections.sort(super.d_sig.neg_edges);
+            else { // edge to be added is negative
+                    if (!super.in_high_signal(release) && !super.in_low_signal(release)) {
+                        System.out.println("adding edge");
+                        super.d_sig.neg_edges.add(release);
+                        Collections.sort(super.d_sig.neg_edges);
+                    }
             }
         }
     }
