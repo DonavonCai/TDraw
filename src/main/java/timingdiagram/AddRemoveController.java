@@ -1,7 +1,6 @@
 package timingdiagram;
 
 import javafx.fxml.FXML;
-import javafx.scene.Group;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
@@ -12,7 +11,7 @@ import javafx.geometry.Pos;
 import javafx.event.ActionEvent;
 import java.util.ArrayList;
 
-public class AddRemoveController {
+public class  AddRemoveController {
     // UI components: ---------------------------------------
     @FXML
     private VBox button_box;
@@ -20,7 +19,7 @@ public class AddRemoveController {
     private VBox signal_box;
     // ------------------------------------------------------
     // Data fields: -----------------------------------------
-    private final int MAX_SIGS = 10;
+    private final int MAX_SIGS = 15;
     private int num_sigs;
     private final String IDLE_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #e0e0e0;";
     private final String PRESSED_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #949494;";
@@ -32,7 +31,7 @@ public class AddRemoveController {
     // ------------------------------------------------------
 
     public void initialize() {
-        num_sigs = 0;
+        num_sigs = 1;
         buttons = new ArrayList<>();
         containers = new ArrayList<>();
         index = 0;
@@ -65,7 +64,6 @@ public class AddRemoveController {
         DSignal signal = new DSignal();
         HBox signal_container = new HBox(signal.draw());
         signal_container.setPadding(new Insets(10));
-        signal_container.setSpacing(5);
         signal_container.setAlignment(Pos.CENTER_LEFT);
 
         signal_box.getChildren().add(signal_container);

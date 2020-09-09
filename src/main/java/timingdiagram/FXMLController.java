@@ -18,8 +18,6 @@ import java.io.IOException;
 import javafx.scene.image.WritableImage;
 import javafx.scene.SnapshotParameters;
 
-import static java.lang.System.exit;
-
 public class FXMLController {
     // UI components: ---------------------------------------
     @FXML
@@ -28,19 +26,22 @@ public class FXMLController {
     private VBox page;
     @FXML
     private MenuItem export_as_png;
-    @FXML
-    private VBox buttons;
 
     private Stage primaryStage;
     // ------------------------------------------------------
     // Helper classes: --------------------------------------
     @FXML
     private AddRemoveController addRemoveController;
+    @FXML
+    private FileMenuController fileMenuController;
     // ======================================================
 
     // Interface: -------------------------------------------
     public void initialize() {
         System.out.println("FXML controller initialized");
+        if (fileMenuController == null) { // fixme: why is this null?
+            System.out.println("NULL!");
+        }
         initMenuEvents();
     }
 
@@ -48,23 +49,15 @@ public class FXMLController {
         primaryStage = s;
         page.prefWidthProperty().bind(s.widthProperty());
     }
+
+    protected VBox get_signal_box() { return addRemoveController.get_signal_box(); }
+
+    protected Stage getPrimaryStage() { return primaryStage;}
     // ------------------------------------------------------
     // Helper Functions: ------------------------------------
     private void initMenuEvents() {
-        export_as_png.setOnAction((ActionEvent event) -> {
-            WritableImage image = addRemoveController.get_signal_box().snapshot(new SnapshotParameters(), null);
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save diagram to...");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
-
-            File file = fileChooser.showSaveDialog(primaryStage);
-
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-            } catch (IOException e) {
-                System.out.println("Failed to save.");
-            }
-        });
+        fileMenuController.setParent(this);
+        fileMenuController.initMenuItems();
     }
     // ------------------------------------------------------
     // Functions called in .fxml files ----------------------
