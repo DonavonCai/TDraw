@@ -1,6 +1,8 @@
-package timingdiagram;
+package timingdiagram.Signal;
 
-class DirectionTracker {
+import java.io.Serializable;
+
+class DirectionTracker implements Serializable {
     protected enum Direction {LEFT, RIGHT, NULL}
     protected enum H_Position{HIGH, LOW}
 

@@ -2,7 +2,7 @@
 
 <?import javafx.scene.layout.*?>
 
-<HBox xmlns:fx="http://javafx.com/fxml" fx:controller = "timingdiagram.AddRemoveController" fx:id="signalWrapper" style="-fx-padding: 10">
+<HBox xmlns:fx="http://javafx.com/fxml" fx:controller = "timingdiagram.SignalController" fx:id="signalWrapper" style="-fx-padding: 10">
         <VBox fx:id="button_box" alignment="CENTER_LEFT" spacing="33" style="-fx-padding: 10;"> </VBox>
         <VBox fx:id="signal_box" alignment="BOTTOM_CENTER" spacing = "10"> </VBox>
 </HBox>

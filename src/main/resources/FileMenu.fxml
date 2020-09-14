@@ -3,6 +3,9 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
 
-<Menu xmlns:fx="http://javafx.com/fxml" fx:id="file" text="File" fx:controller="timingdiagram.FileMenuController">
-    <MenuItem fx:id="export_as_png" text="export as PNG"> </MenuItem>
+<Menu xmlns:fx="http://javafx.com/fxml" fx:id="file" text="File" fx:controller="timingdiagram.MenuController.FileMenuController">
+    <MenuItem fx:id="new_project" text="New"> </MenuItem>
+    <MenuItem fx:id="open" text="Open"> </MenuItem>
+    <MenuItem fx:id="save" text="Save"> </MenuItem>
+    <MenuItem fx:id="export_as_png" text="Export as PNG"> </MenuItem>
 </Menu>

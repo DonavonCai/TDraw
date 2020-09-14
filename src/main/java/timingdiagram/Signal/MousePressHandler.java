@@ -1,4 +1,4 @@
-package timingdiagram;
+package timingdiagram.Signal;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;

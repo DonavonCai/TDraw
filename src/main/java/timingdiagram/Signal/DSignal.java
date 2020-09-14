@@ -1,4 +1,4 @@
-package timingdiagram;
+package timingdiagram.Signal;
 
 import javafx.geometry.Pos;
 
@@ -12,15 +12,18 @@ import javafx.scene.layout.Pane;
 import javafx.scene.input.MouseEvent;
 import javafx.event.EventHandler;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-class DSignal {
+public class DSignal implements Serializable {
     // layout
     protected final int height;
     protected final int canvas_width;
     protected final int line_width;
-    private final Canvas signal;
-    protected final GraphicsContext gc;
+
+    transient private Canvas signal;
+    transient protected GraphicsContext gc;
+
     // direction checking
     private final DirectionTracker directionTracker;
     // event handling
@@ -34,7 +37,7 @@ class DSignal {
     protected final ArrayList<Integer> pos_edges;
     protected final ArrayList<Integer> neg_edges;
 
-    DSignal() {
+    public DSignal() {
         // layout
         height = 30;
         canvas_width = 700;
@@ -53,7 +56,7 @@ class DSignal {
         neg_edges = new ArrayList<>();
     }
 
-    HBox draw() { // initializes all elements required for DSignal, including buttons, canvas, event handlers, etc.
+    public HBox draw() { // initializes all elements required for DSignal, including buttons, canvas, event handlers, etc.
         TextField name = new TextField("Signal_Name");
         name.setStyle("-fx-background-color: white;");
         name.setAlignment(Pos.BOTTOM_RIGHT);
@@ -104,5 +107,10 @@ class DSignal {
         gc.lineTo(canvas_width, height);
         gc.stroke();
         gc.stroke(); // second stroke makes it more solid
+    }
+
+    public void reconstruct() { // todo: implement
+        // create new canvas, draw lines
+        // create new graphics context
     }
 }

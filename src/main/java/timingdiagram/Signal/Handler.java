@@ -1,9 +1,11 @@
-package timingdiagram;
+package timingdiagram.Signal;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
-abstract class Handler {
+import java.io.Serializable;
+
+abstract class Handler implements Serializable {
     protected final DSignal d_sig;
     protected final DirectionTracker directionTracker;
 
