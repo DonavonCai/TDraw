@@ -1,11 +1,11 @@
-package timingdiagram.Signal;
+package timingdiagram.DSignal;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 
 import java.util.Collections;
 
-public class  MouseReleaseHandler extends Handler {
+class  MouseReleaseHandler extends Handler {
 
     MouseReleaseHandler(DSignal d, DirectionTracker t) {
         super(d, t);

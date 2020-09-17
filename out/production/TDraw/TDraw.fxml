@@ -19,6 +19,6 @@
         <VBox fx:id="buttons" minWidth="100" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-spacing: 24">
             <Button text="add signal" onMouseClicked="#addSignal"> </Button>
         </VBox>
-        <fx:include fx:id="signal" source="SignalController.fxml"> </fx:include>
+        <fx:include fx:id="signal" source="Signal.fxml"> </fx:include>
     </VBox>
 </Group>

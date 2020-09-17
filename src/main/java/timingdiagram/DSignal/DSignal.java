@@ -1,4 +1,4 @@
-package timingdiagram.Signal;
+package timingdiagram.DSignal;
 
 import javafx.geometry.Pos;
 
@@ -17,12 +17,16 @@ import java.util.ArrayList;
 
 public class DSignal implements Serializable {
     // layout
-    protected final int height;
-    protected final int canvas_width;
-    protected final int line_width;
+    protected final int height = 30;
+    protected final int canvas_width = 700;
+    protected final int line_width = 3;
 
+    transient private HBox diagram;
+    transient private Pane signalPane;
     transient private Canvas signal;
     transient protected GraphicsContext gc;
+
+    transient private TextField name;
 
     // direction checking
     private final DirectionTracker directionTracker;
@@ -37,13 +41,15 @@ public class DSignal implements Serializable {
     protected final ArrayList<Integer> pos_edges;
     protected final ArrayList<Integer> neg_edges;
 
+    public HBox getDiagram() { return diagram; }
+
     public DSignal() {
         // layout
-        height = 30;
-        canvas_width = 700;
-        line_width = 3;
-        signal = new Canvas(canvas_width, height);
+        signal = new Canvas();
+        signalPane = new Pane();
         gc = signal.getGraphicsContext2D();
+        name = new TextField();
+        diagram = new HBox();
         // direction checking
         directionTracker = new DirectionTracker();
         // event handling
@@ -54,22 +60,34 @@ public class DSignal implements Serializable {
         // data
         pos_edges = new ArrayList<>();
         neg_edges = new ArrayList<>();
+
+        style();
+        format();
+        activateEventHandlers();
+        init_line();
     }
 
-    public HBox draw() { // initializes all elements required for DSignal, including buttons, canvas, event handlers, etc.
-        TextField name = new TextField("Signal_Name");
+    private void style() {
         name.setStyle("-fx-background-color: white;");
         name.setAlignment(Pos.BOTTOM_RIGHT);
         name.setMaxWidth(100.0);
 
-        // style the pane instead of the canvas
-        Pane signalPane = new Pane(signal);
+        signal.setWidth(canvas_width);
+        signal.setHeight(height);
         signalPane.setPrefSize(canvas_width, height);
-        init_line();
-        HBox diagram = new HBox(name, signalPane);
+
         diagram.setSpacing(5);
         diagram.setAlignment(Pos.BOTTOM_CENTER);
+    }
 
+    private void format() {
+        signalPane.getChildren().add(signal);
+        name.setText("Signal_Name");
+        diagram.getChildren().add(name);
+        diagram.getChildren().add(signalPane);
+    }
+
+    public void activateEventHandlers() {
         signalPane.addEventHandler(MouseEvent.MOUSE_PRESSED,
                 new EventHandler<MouseEvent>() {
                     @Override
@@ -78,7 +96,6 @@ public class DSignal implements Serializable {
                     }
                 }
         );
-
         signalPane.addEventHandler(MouseEvent.MOUSE_DRAGGED,
                 new EventHandler<MouseEvent>() {
                     @Override
@@ -87,7 +104,6 @@ public class DSignal implements Serializable {
                     }
                 }
         );
-
         signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
                 new EventHandler<MouseEvent>() {
                     @Override
@@ -96,7 +112,6 @@ public class DSignal implements Serializable {
                     }
                 }
         );
-        return diagram;
     }
 
     private void init_line() { // draws default line
@@ -109,8 +124,35 @@ public class DSignal implements Serializable {
         gc.stroke(); // second stroke makes it more solid
     }
 
-    public void reconstruct() { // todo: implement
-        // create new canvas, draw lines
-        // create new graphics context
+    // Initialize transient fields.
+    public void redraw() {
+        diagram = new HBox();
+        signalPane = new Pane();
+        signal = new Canvas();
+        gc = signal.getGraphicsContext2D();
+        name = new TextField();
+        style();
+        format();
+        // Event handlers and direction tracker are serializable, don't have to create new.
+        activateEventHandlers();
+        draw_from_save();
+    }
+
+    private void draw_from_save() {
+        // note: assume edges are balanced
+        for (int i = 0; i < pos_edges.size(); i++) {
+            draw_vertical(pos_edges.get(i));
+            draw_vertical(neg_edges.get(i));
+            // todo: fill in horizontal lines
+        }
+    }
+
+    protected void draw_vertical(int coord) {
+        gc.beginPath();
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(line_width);
+        gc.moveTo(coord, height);
+        gc.lineTo(coord, 0);
+        gc.stroke();
     }
 }

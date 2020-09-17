@@ -1,10 +1,7 @@
 package timingdiagram;
 
 // Layout
-import javafx.scene.Group;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
 
@@ -15,8 +12,7 @@ import java.io.ObjectOutputStream;
 
 // Event handling
 import timingdiagram.MenuController.FileMenuController;
-
-import static java.lang.System.exit;
+import timingdiagram.SignalController.SignalController;
 
 public class FXMLController {
     // UI components: ---------------------------------------
@@ -47,24 +43,11 @@ public class FXMLController {
     public Stage getPrimaryStage() { return primaryStage;}
 
     public void save(File file, ObjectOutputStream obj) {
-        try {
-            obj.writeObject(signalController);
-        } catch (Exception e) {
-            System.out.println("Failed to save:");
-            e.printStackTrace();
-        }
+        signalController.save(file, obj);
     }
 
     public void open(File file, ObjectInputStream obj) {
-        try {
-            page.getChildren().remove(signalController.getWrapper());
-            signalController = (SignalController)obj.readObject();
-            signalController.reconstruct();
-            page.getChildren().add(signalController.getWrapper());
-        } catch (Exception e) {
-            e.printStackTrace();
-//            exit(1);
-        }
+        signalController.open(file, obj);
     }
     // ------------------------------------------------------
     // Helper Functions: ------------------------------------

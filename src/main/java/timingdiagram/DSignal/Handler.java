@@ -1,28 +1,32 @@
-package timingdiagram.Signal;
+package timingdiagram.DSignal;
 
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 
 import java.io.Serializable;
 
 abstract class Handler implements Serializable {
-    protected final DSignal d_sig;
-    protected final DirectionTracker directionTracker;
+    protected DSignal d_sig;
+    protected DirectionTracker directionTracker;
 
     Handler(DSignal d, DirectionTracker t) {
         d_sig = d;
         directionTracker = t;
     }
 
+    protected void setDSig(DSignal d) {
+        d_sig = d;
+    }
+
     abstract public void handle(MouseEvent event);
 
     protected void draw_vertical(int coord) {
-        d_sig.gc.beginPath();
-        d_sig.gc.setStroke(Color.BLACK);
-        d_sig.gc.setLineWidth(d_sig.line_width);
-        d_sig.gc.moveTo(coord, d_sig.height);
-        d_sig.gc.lineTo(coord, 0);
-        d_sig.gc.stroke();
+//        d_sig.gc.beginPath();
+//        d_sig.gc.setStroke(Color.BLACK);
+//        d_sig.gc.setLineWidth(d_sig.line_width);
+//        d_sig.gc.moveTo(coord, d_sig.height);
+//        d_sig.gc.lineTo(coord, 0);
+//        d_sig.gc.stroke();
+        d_sig.draw_vertical(coord);
     }
 
     // returns true if coord is in between 2 pairs of edges that form a high signal

@@ -1,4 +1,4 @@
-package timingdiagram.Signal;
+package timingdiagram.DSignal;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MouseDragHandler extends Handler {
+class MouseDragHandler extends Handler {
 
     MouseDragHandler(DSignal d, DirectionTracker t) {
         super(d, t);
