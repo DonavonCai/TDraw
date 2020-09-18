@@ -140,10 +140,13 @@ public class DSignal implements Serializable {
 
     private void draw_from_save() {
         // note: assume edges are balanced
+        init_line();
         for (int i = 0; i < pos_edges.size(); i++) {
+            int pos = pos_edges.get(i);
+            int neg = neg_edges.get(i);
             draw_vertical(pos_edges.get(i));
             draw_vertical(neg_edges.get(i));
-            // todo: fill in horizontal lines
+            draw_high(pos, neg, DirectionTracker.Direction.RIGHT);
         }
     }
 
@@ -154,5 +157,55 @@ public class DSignal implements Serializable {
         gc.moveTo(coord, height);
         gc.lineTo(coord, 0);
         gc.stroke();
+    }
+
+    protected void draw_low(int from, int to, DirectionTracker.Direction direction) {
+        // draw the line
+        gc.beginPath();
+        gc.moveTo(from, height);
+        gc.lineTo(to, height);
+        gc.stroke();
+
+        // erase stuff above the line
+        int rect_x;
+        int rect_y = 0;
+        int rect_width;
+        int rect_height = height - line_width + 1;
+        gc.setFill(Color.WHITE);
+
+        if (direction == DirectionTracker.Direction.LEFT) { // erase stuff to right
+            rect_x = to;
+            rect_width = from - to;
+        }
+        else { // erase stuff to left
+            rect_x = from;
+            rect_width = to - from;
+        }
+        gc.fillRect(rect_x, rect_y, rect_width, rect_height);
+    }
+
+    protected void draw_high(int from, int to, DirectionTracker.Direction direction) {
+        // draw the line
+        gc.beginPath();
+        gc.moveTo(from, 0);
+        gc.lineTo(to, 0);
+        gc.stroke();
+
+        // erase stuff below the line
+        int rect_x;
+        int rect_y = line_width - 1;
+        int rect_width;
+        int rect_height = height;
+        gc.setFill(Color.WHITE);
+
+        if (direction == DirectionTracker.Direction.LEFT) { // erase right
+            rect_x = to;
+            rect_width = from - to;
+        }
+        else { // erase left
+            rect_x = from;
+            rect_width = to - from;
+        }
+        gc.fillRect(rect_x, rect_y, rect_width, rect_height);
     }
 }

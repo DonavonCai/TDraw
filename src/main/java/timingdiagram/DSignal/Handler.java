@@ -13,20 +13,14 @@ abstract class Handler implements Serializable {
         directionTracker = t;
     }
 
-    protected void setDSig(DSignal d) {
-        d_sig = d;
-    }
-
     abstract public void handle(MouseEvent event);
 
     protected void draw_vertical(int coord) {
-//        d_sig.gc.beginPath();
-//        d_sig.gc.setStroke(Color.BLACK);
-//        d_sig.gc.setLineWidth(d_sig.line_width);
-//        d_sig.gc.moveTo(coord, d_sig.height);
-//        d_sig.gc.lineTo(coord, 0);
-//        d_sig.gc.stroke();
         d_sig.draw_vertical(coord);
+    }
+
+    protected DirectionTracker.Direction getCurrentDirection() {
+        return directionTracker.current_direction;
     }
 
     // returns true if coord is in between 2 pairs of edges that form a high signal
