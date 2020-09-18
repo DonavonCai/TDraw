@@ -1,4 +1,4 @@
-package timingdiagram;
+package timingdiagram.DSignal;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MouseDragHandler extends Handler {
+class MouseDragHandler extends Handler {
 
     MouseDragHandler(DSignal d, DirectionTracker t) {
         super(d, t);
@@ -54,7 +54,11 @@ public class MouseDragHandler extends Handler {
         if (!super.in_high_signal(coord) && !super.in_low_signal(coord)) { // vertical line is drawn over as mouse is dragged
             super.draw_vertical(coord);
         }
-        draw_horizontal(coord, super.d_sig.current_edge, super.directionTracker.current_direction);
+
+        if (super.directionTracker.get_hpos() == DirectionTracker.H_Position.HIGH)
+            super.d_sig.draw_high(super.d_sig.current_edge, coord, super.directionTracker.current_direction);
+        else
+            super.d_sig.draw_low(super.d_sig.current_edge, coord, super.directionTracker.current_direction);
 
         clear_covered_edges(event);
 
@@ -192,51 +196,5 @@ public class MouseDragHandler extends Handler {
             }
         }
         return r;
-    }
-
-    protected void draw_horizontal(int coord, int respective_edge, DirectionTracker.Direction current_direction) {
-        boolean draw_high = (super.directionTracker.get_hpos() == DirectionTracker.H_Position.HIGH);
-
-        super.d_sig.gc.beginPath();
-        super.d_sig.gc.setStroke(Color.BLACK);
-        super.d_sig.gc.setLineWidth(super.d_sig.line_width);
-
-        // for erasing signal
-        int rect_x;
-        int rect_y;
-        int rect_width;
-        int rect_height;
-
-        // erase right
-        // erase left
-        if (draw_high) {
-            super.d_sig.gc.moveTo(respective_edge, 0);
-            super.d_sig.gc.lineTo(coord, 0);
-            super.d_sig.gc.stroke();
-
-            // erase lower
-            super.d_sig.gc.setFill(Color.WHITE);
-            rect_y = super.d_sig.line_width - 1;
-            rect_height = super.d_sig.height;
-        }
-        else {
-            super.d_sig.gc.moveTo(respective_edge, super.d_sig.height);
-            super.d_sig.gc.lineTo(coord, super.d_sig.height);
-            super.d_sig.gc.stroke();
-
-            // erase upper
-            super.d_sig.gc.setFill(Color.WHITE);
-            rect_y = 0;
-            rect_height = super.d_sig.height - super.d_sig.line_width + 1;
-        }
-        if (current_direction == DirectionTracker.Direction.LEFT) { // erase right
-            rect_x = coord;
-            rect_width = respective_edge - coord;
-        }
-        else { // erase left
-            rect_x = respective_edge;
-            rect_width = coord - respective_edge;
-        }
-        super.d_sig.gc.fillRect(rect_x, rect_y, rect_width, rect_height);
     }
 }
