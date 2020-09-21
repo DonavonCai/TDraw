@@ -15,6 +15,7 @@ import timingdiagram.DSignal.DSignal;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import static java.lang.System.exit;
 
 public class SignalController {
     // UI components: ---------------------------------------
@@ -83,7 +84,14 @@ public class SignalController {
         return signal_container;
     }
 
-    public void save(File file, ObjectOutputStream obj) {
+    public void newProject() {
+        button_box.getChildren().clear();
+        signal_box.getChildren().clear();
+        storage.num_sigs = 0;
+        add_signal();
+    }
+
+    public void save(ObjectOutputStream obj) {
         try {
             obj.writeObject(storage);
         } catch (Exception e) {
@@ -92,7 +100,7 @@ public class SignalController {
         }
     }
 
-    public void open(File file, ObjectInputStream obj) {
+    public void open(ObjectInputStream obj) {
         try {
             button_box.getChildren().clear();
             signal_box.getChildren().clear();
@@ -100,7 +108,7 @@ public class SignalController {
             reconstruct();
         } catch (Exception e) {
             e.printStackTrace();
-//            exit(1);
+            exit(1);
         }
     }
 

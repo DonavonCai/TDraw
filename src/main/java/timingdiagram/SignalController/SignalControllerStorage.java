@@ -2,8 +2,6 @@ package timingdiagram.SignalController;
 
 import timingdiagram.DSignal.DSignal;
 
-import java.io.File;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 

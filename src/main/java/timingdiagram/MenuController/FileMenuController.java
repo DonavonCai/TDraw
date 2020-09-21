@@ -18,18 +18,25 @@ import java.io.IOException;
 
 public class FileMenuController extends MenuController {
     @FXML
-    private MenuItem open;
+    private MenuItem new_project;
     @FXML
-    private MenuItem close;
+    private MenuItem open;
     @FXML
     private MenuItem save;
     @FXML
     private MenuItem export_as_png;
 
     public void initialize() {
+        init_new_project();
         init_open();
         init_save();
         init_export_as_png();
+    }
+
+    private void init_new_project() {
+        new_project.setOnAction((ActionEvent event) -> {
+            parent.newProject();
+        });
     }
 
     private void init_open() {
@@ -44,7 +51,7 @@ public class FileMenuController extends MenuController {
                 FileInputStream fin = new FileInputStream(file.getPath());
                 ObjectInputStream obj = new ObjectInputStream(fin);
 
-                parent.open(file, obj);
+                parent.open(obj);
                 fin.close();
                 obj.close();
             } catch (Exception e) {
@@ -65,7 +72,7 @@ public class FileMenuController extends MenuController {
             try {
                 FileOutputStream fout = new FileOutputStream(file.getPath());
                 ObjectOutputStream obj = new ObjectOutputStream(fout);
-                parent.save(file, obj);
+                parent.save(obj);
                 fout.close();
                 obj.close();
             } catch (Exception e) {

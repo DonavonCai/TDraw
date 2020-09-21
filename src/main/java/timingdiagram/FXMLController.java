@@ -6,7 +6,6 @@ import javafx.stage.Stage;
 import javafx.fxml.FXML;
 
 // saving
-import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -42,12 +41,16 @@ public class FXMLController {
 
     public Stage getPrimaryStage() { return primaryStage;}
 
-    public void save(File file, ObjectOutputStream obj) {
-        signalController.save(file, obj);
+    public void newProject() {
+        signalController.newProject();
     }
 
-    public void open(File file, ObjectInputStream obj) {
-        signalController.open(file, obj);
+    public void save(ObjectOutputStream obj) {
+        signalController.save(obj);
+    }
+
+    public void open(ObjectInputStream obj) {
+        signalController.open(obj);
     }
     // ------------------------------------------------------
     // Helper Functions: ------------------------------------
