@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
 <HBox xmlns:fx="http://javafx.com/fxml" fx:controller = "timingdiagram.SignalController.SignalController" fx:id="signalWrapper" style="-fx-padding: 10">
-        <VBox fx:id="button_box" alignment="CENTER_LEFT" spacing="33" style="-fx-padding: 10;"> </VBox>
-        <VBox fx:id="signal_box" alignment="BOTTOM_CENTER" spacing = "10"> </VBox>
+        <VBox fx:id="button_box" alignment="CENTER_LEFT" spacing="31" style="-fx-padding: 10;" minHeight="60"> </VBox>
+        <VBox fx:id="signal_box" alignment="CENTER_LEFT" spacing="30" minHeight="60"> </VBox>
+        <fx:include fx:id="widthSelector" source="WidthSelector.fxml"> </fx:include>
 </HBox>

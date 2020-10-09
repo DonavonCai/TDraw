@@ -14,12 +14,13 @@ import javafx.event.EventHandler;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import timingdiagram.SignalController.SignalController;
 
 public class DSignal implements Serializable {
+    // controller
+    SignalController signalController;
     // layout
-    protected final int height = 30;
-    protected final int canvas_width = 700;
-    protected final int line_width = 3;
+    private final int name_width = 100;
 
     transient private HBox diagram;
     transient private Pane signalPane;
@@ -43,7 +44,9 @@ public class DSignal implements Serializable {
 
     public HBox getDiagram() { return diagram; }
 
-    public DSignal() {
+    public DSignal(SignalController s) {
+        // todo: implement setWidth function, call this function from SignalController.add_signal()?
+        signalController = s;
         // layout
         signal = new Canvas();
         signalPane = new Pane();
@@ -67,16 +70,22 @@ public class DSignal implements Serializable {
         init_line();
     }
 
+    public void setCanvasWidth(double w) {
+        signal.setWidth(w);
+        signalPane.setPrefWidth(w);
+    }
+
     private void style() {
+        int canvasWidth = signalController.getCanvasWidth();
+        int height = signalController.SIGNAL_HEIGHT;
         name.setStyle("-fx-background-color: white;");
         name.setAlignment(Pos.BOTTOM_RIGHT);
-        name.setMaxWidth(100.0);
+        name.setMaxWidth(name_width);
 
-        signal.setWidth(canvas_width);
+        signal.setWidth(canvasWidth);
         signal.setHeight(height);
-        signalPane.setPrefSize(canvas_width, height);
+        signalPane.setPrefSize(canvasWidth, height);
 
-        diagram.setSpacing(5);
         diagram.setAlignment(Pos.BOTTOM_CENTER);
     }
 
@@ -115,11 +124,14 @@ public class DSignal implements Serializable {
     }
 
     private void init_line() { // draws default line
+        int height = signalController.SIGNAL_HEIGHT;
+        int canvasWidth = signalController.getCanvasWidth();
+
         gc.beginPath();
-        gc.setLineWidth(line_width);
+        gc.setLineWidth(signalController.LINE_WIDTH);
         gc.setFill(Color.BLACK);
         gc.moveTo(0, height);
-        gc.lineTo(canvas_width, height);
+        gc.lineTo(canvasWidth, height);
         gc.stroke();
         gc.stroke(); // second stroke makes it more solid
     }
@@ -153,13 +165,15 @@ public class DSignal implements Serializable {
     protected void draw_vertical(int coord) {
         gc.beginPath();
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(line_width);
-        gc.moveTo(coord, height);
+        gc.setLineWidth(signalController.LINE_WIDTH);
+        gc.moveTo(coord, signalController.SIGNAL_HEIGHT);
         gc.lineTo(coord, 0);
         gc.stroke();
     }
 
     protected void draw_low(int from, int to, DirectionTracker.Direction direction) {
+        int height = signalController.SIGNAL_HEIGHT;
+        int lineWidth = signalController.LINE_WIDTH;
         // draw the line
         gc.beginPath();
         gc.moveTo(from, height);
@@ -170,7 +184,7 @@ public class DSignal implements Serializable {
         int rect_x;
         int rect_y = 0;
         int rect_width;
-        int rect_height = height - line_width + 1;
+        int rect_height = height - lineWidth + 1;
         gc.setFill(Color.WHITE);
 
         if (direction == DirectionTracker.Direction.LEFT) { // erase stuff to right
@@ -185,6 +199,7 @@ public class DSignal implements Serializable {
     }
 
     protected void draw_high(int from, int to, DirectionTracker.Direction direction) {
+        int lineWidth = signalController.LINE_WIDTH;
         // draw the line
         gc.beginPath();
         gc.moveTo(from, 0);
@@ -193,9 +208,9 @@ public class DSignal implements Serializable {
 
         // erase stuff below the line
         int rect_x;
-        int rect_y = line_width - 1;
+        int rect_y = lineWidth - 1;
         int rect_width;
-        int rect_height = height;
+        int rect_height = signalController.SIGNAL_HEIGHT;
         gc.setFill(Color.WHITE);
 
         if (direction == DirectionTracker.Direction.LEFT) { // erase right

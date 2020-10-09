@@ -52,6 +52,7 @@ public class FXMLController {
     public void open(ObjectInputStream obj) {
         signalController.open(obj);
     }
+
     // ------------------------------------------------------
     // Helper Functions: ------------------------------------
     private void initMenus() {
