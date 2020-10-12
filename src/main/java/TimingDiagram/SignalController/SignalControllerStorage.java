@@ -1,12 +1,12 @@
-package timingdiagram.SignalController;
+package TimingDiagram.SignalController;
 
-import timingdiagram.DSignal.DSignal;
+import TimingDiagram.DSignal.DSignal;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
 class SignalControllerStorage implements Serializable {
-    private int canvasWidth;
+    private double canvasWidth;
     protected final int MAX_SIGS = 15;
     protected int num_sigs;
     protected final String IDLE_BUTTON_STYLE = "-fx-border-width: 1; -fx-border-color: black; -fx-background-color: #e0e0e0;";
@@ -20,6 +20,6 @@ class SignalControllerStorage implements Serializable {
         signals = new ArrayList<>();
     }
 
-    public int getCanvasWidth() {return canvasWidth;}
-    public void setCanvasWidth(int w) {canvasWidth = w;}
+    public double getCanvasWidth() {return canvasWidth;}
+    public void setCanvasWidth(double w) {canvasWidth = w;}
 }

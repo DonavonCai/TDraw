@@ -1,4 +1,4 @@
-package timingdiagram.DSignal;
+package TimingDiagram.DSignal;
 
 import javafx.geometry.Pos;
 
@@ -14,9 +14,11 @@ import javafx.event.EventHandler;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import timingdiagram.SignalController.SignalController;
+import TimingDiagram.SignalController.SignalController;
+import TimingDiagram.DSignal.Edge.Edge;
 
 public class DSignal implements Serializable {
+// Data, Constructor: ----------------------------------------------------------
     // controller
     SignalController signalController;
     // layout
@@ -41,11 +43,9 @@ public class DSignal implements Serializable {
     protected int initial_edge;
     protected final ArrayList<Integer> pos_edges;
     protected final ArrayList<Integer> neg_edges;
-
-    public HBox getDiagram() { return diagram; }
+//    protected final ArrayList<Edge> edges;
 
     public DSignal(SignalController s) {
-        // todo: implement setWidth function, call this function from SignalController.add_signal()?
         signalController = s;
         // layout
         signal = new Canvas();
@@ -64,76 +64,33 @@ public class DSignal implements Serializable {
         pos_edges = new ArrayList<>();
         neg_edges = new ArrayList<>();
 
+//        edges = new ArrayList<>();
+
         style();
         format();
         activateEventHandlers();
         init_line();
     }
 
+// Public interface: ---------------------------------------------------------------------------
+    // Diagram is what we want to export as an image file.
+    public HBox getDiagram() {
+        return diagram;
+    }
+
     public void setCanvasWidth(double w) {
+        // todo: instead of setting it here, should these be bound to SignalControllerStorage.canvasWidth?
         signal.setWidth(w);
         signalPane.setPrefWidth(w);
+
+        if (w <signalController.getCanvasWidth())
+            shortenLineTo(w);
+        else if (w > signalController.getCanvasWidth())
+            extendLineTo(w);
     }
 
-    private void style() {
-        int canvasWidth = signalController.getCanvasWidth();
-        int height = signalController.SIGNAL_HEIGHT;
-        name.setStyle("-fx-background-color: white;");
-        name.setAlignment(Pos.BOTTOM_RIGHT);
-        name.setMaxWidth(name_width);
-
-        signal.setWidth(canvasWidth);
-        signal.setHeight(height);
-        signalPane.setPrefSize(canvasWidth, height);
-
-        diagram.setAlignment(Pos.BOTTOM_CENTER);
-    }
-
-    private void format() {
-        signalPane.getChildren().add(signal);
-        name.setText("Signal_Name");
-        diagram.getChildren().add(name);
-        diagram.getChildren().add(signalPane);
-    }
-
-    public void activateEventHandlers() {
-        signalPane.addEventHandler(MouseEvent.MOUSE_PRESSED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) { // code is repeated to avoid event handling with mouse buttons other than left and right click
-                        press_handler.handle(event);
-                    }
-                }
-        );
-        signalPane.addEventHandler(MouseEvent.MOUSE_DRAGGED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        drag_handler.handle(event);
-                    }
-                }
-        );
-        signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        release_handler.handle(event);
-                    }
-                }
-        );
-    }
-
-    private void init_line() { // draws default line
-        int height = signalController.SIGNAL_HEIGHT;
-        int canvasWidth = signalController.getCanvasWidth();
-
-        gc.beginPath();
-        gc.setLineWidth(signalController.LINE_WIDTH);
-        gc.setFill(Color.BLACK);
-        gc.moveTo(0, height);
-        gc.lineTo(canvasWidth, height);
-        gc.stroke();
-        gc.stroke(); // second stroke makes it more solid
+    public double getCanvasWidth() {
+        return signalPane.getWidth();
     }
 
     // Initialize transient fields.
@@ -150,17 +107,15 @@ public class DSignal implements Serializable {
         draw_from_save();
     }
 
-    private void draw_from_save() {
-        // note: assume edges are balanced
-        init_line();
-        for (int i = 0; i < pos_edges.size(); i++) {
-            int pos = pos_edges.get(i);
-            int neg = neg_edges.get(i);
-            draw_vertical(pos_edges.get(i));
-            draw_vertical(neg_edges.get(i));
-            draw_high(pos, neg, DirectionTracker.Direction.RIGHT);
-        }
-    }
+// Protected functions: --------------------------------------------------------------
+    // todo: used for edges
+//    protected void addEdge(Edge e) {
+//        edges.add(e);
+//    }
+//
+//    protected void removeEdgeByCoord(double from , double to) {
+//
+//    }
 
     protected void draw_vertical(int coord) {
         gc.beginPath();
@@ -222,5 +177,93 @@ public class DSignal implements Serializable {
             rect_width = to - from;
         }
         gc.fillRect(rect_x, rect_y, rect_width, rect_height);
+    }
+
+// Helper Functions: -----------------------------------------------------------------
+    // Draws default line when application is first launched.
+    private void init_line() {
+        int height = signalController.SIGNAL_HEIGHT;
+        double canvasWidth = signalController.getCanvasWidth();
+
+        gc.beginPath();
+        gc.setLineWidth(signalController.LINE_WIDTH);
+        gc.setFill(Color.BLACK);
+        gc.moveTo(0, height);
+        gc.lineTo(canvasWidth, height);
+        gc.stroke();
+        gc.stroke(); // second stroke makes it more solid
+    }
+
+    private void style() {
+        double canvasWidth = signalController.getCanvasWidth();
+        int height = signalController.SIGNAL_HEIGHT;
+        name.setStyle("-fx-background-color: white;");
+        name.setAlignment(Pos.BOTTOM_RIGHT);
+        name.setMaxWidth(name_width);
+
+        signal.setWidth(canvasWidth);
+        signal.setHeight(height);
+        signalPane.setPrefSize(canvasWidth, height);
+
+        diagram.setAlignment(Pos.BOTTOM_CENTER);
+    }
+
+    // Set object hierarchy.
+    private void format() {
+        signalPane.getChildren().add(signal);
+        name.setText("Signal_Name");
+        diagram.getChildren().add(name);
+        diagram.getChildren().add(signalPane);
+    }
+
+    // Draws lines on canvas according to saved edges.
+    private void draw_from_save() {
+        // note: assume edges are balanced
+        init_line();
+        for (int i = 0; i < pos_edges.size(); i++) {
+            int pos = pos_edges.get(i);
+            int neg = neg_edges.get(i);
+            draw_vertical(pos_edges.get(i));
+            draw_vertical(neg_edges.get(i));
+            draw_high(pos, neg, DirectionTracker.Direction.RIGHT);
+        }
+    }
+
+    // Extends the line to coordinate x according to rightmost edge, adds closing edge just outside of visible canvas.
+    private void extendLineTo(double x) {
+        // todo: get last edge, check type, extend line, move closing edge.
+    }
+
+    // Shortens line to x, removing any edges to the right of x.
+    // todo: this will probably affect edges_balanced. Maybe try putting an invisible closing edge at the edge of the canvas?
+    private void shortenLineTo(double x) {
+        // todo: get closest left edge, remove all right edges, add closing edge.
+    }
+
+    private void activateEventHandlers() {
+        signalPane.addEventHandler(MouseEvent.MOUSE_PRESSED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        press_handler.handle(event);
+                    }
+                }
+        );
+        signalPane.addEventHandler(MouseEvent.MOUSE_DRAGGED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        drag_handler.handle(event);
+                    }
+                }
+        );
+        signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        release_handler.handle(event);
+                    }
+                }
+        );
     }
 }

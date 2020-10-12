@@ -1,6 +1,6 @@
-package timingdiagram.MenuController;
+package TimingDiagram.MenuController;
 
-import timingdiagram.FXMLController;
+import TimingDiagram.FXMLController;
 
 abstract class MenuController {
     protected FXMLController parent;

@@ -1,4 +1,4 @@
-package timingdiagram;
+package TimingDiagram;
 
 // Layout
 import javafx.scene.layout.VBox;
@@ -10,8 +10,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 // Event handling
-import timingdiagram.MenuController.FileMenuController;
-import timingdiagram.SignalController.SignalController;
+import TimingDiagram.MenuController.FileMenuController;
+import TimingDiagram.SignalController.SignalController;
 
 public class FXMLController {
     // UI components: ---------------------------------------

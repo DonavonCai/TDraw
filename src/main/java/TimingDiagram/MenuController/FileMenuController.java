@@ -1,4 +1,4 @@
-package timingdiagram.MenuController;
+package TimingDiagram.MenuController;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;

@@ -1,4 +1,4 @@
-package timingdiagram.SignalController;
+package TimingDiagram.SignalController;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -9,8 +9,8 @@ import javafx.scene.control.Button;
 import javafx.geometry.Pos;
 // event handling
 import javafx.event.ActionEvent;
-import timingdiagram.DSignal.DSignal;
-import timingdiagram.SignalController.WidthController.WidthSelectorController;
+import TimingDiagram.DSignal.DSignal;
+import TimingDiagram.SignalController.WidthController.WidthSelectorController;
 // saving + opening
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -81,14 +81,14 @@ public class SignalController {
         }
     }
 
-    public int getCanvasWidth() {
+    public double getCanvasWidth() {
         return storage.getCanvasWidth();
     }
 
     public void setSignalWidths(double w) {
         System.out.println("canvas width is now: " + storage.getCanvasWidth());
         System.out.println("changing to: " + w);
-        storage.setCanvasWidth((int)w);
+        storage.setCanvasWidth(w);
         for (int i = 0; i < storage.signals.size(); i++) {
             storage.signals.get(i).setCanvasWidth(w);
         }

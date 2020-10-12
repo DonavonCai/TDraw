@@ -1,4 +1,4 @@
-package timingdiagram.SignalController.WidthController;
+package TimingDiagram.SignalController.WidthController;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -13,7 +13,7 @@ import javafx.event.EventHandler;
 import javafx.beans.property.BooleanProperty;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
-import timingdiagram.SignalController.SignalController;
+import TimingDiagram.SignalController.SignalController;
 
 public class WidthSelectorController {
     SignalController parent;

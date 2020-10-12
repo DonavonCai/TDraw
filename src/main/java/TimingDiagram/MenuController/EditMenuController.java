@@ -1,4 +1,4 @@
-package timingdiagram.MenuController;
+package TimingDiagram.MenuController;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;

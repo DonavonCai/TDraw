@@ -8,7 +8,7 @@
 
 <!-- note: fx:id for components with controller are <name>
  and are referenced as <name>Controller in injected @FXML fields -->
-<Group xmlns:fx="http://javafx.com/fxml" fx:id="root" fx:controller="timingdiagram.FXMLController">
+<Group xmlns:fx="http://javafx.com/fxml" fx:id="root" fx:controller="TimingDiagram.FXMLController">
     <VBox fx:id="page">
         <MenuBar prefWidth="${page.width}" style="-fx-background-color: white; -fx-border-color: transparent transparent gray transparent">
             <menus>

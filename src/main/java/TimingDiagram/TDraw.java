@@ -1,4 +1,4 @@
-package timingdiagram;
+package TimingDiagram;
 // grouping
 import javafx.application.Application;
 import javafx.scene.Group;

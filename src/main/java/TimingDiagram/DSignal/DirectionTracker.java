@@ -1,4 +1,4 @@
-package timingdiagram.DSignal;
+package TimingDiagram.DSignal;
 
 import java.io.Serializable;
 

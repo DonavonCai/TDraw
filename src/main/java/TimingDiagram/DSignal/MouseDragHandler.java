@@ -1,4 +1,4 @@
-package timingdiagram.DSignal;
+package TimingDiagram.DSignal;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
@@ -144,6 +144,7 @@ class MouseDragHandler extends Handler {
         }
         clear_pos(left_pos, right_pos);
         clear_neg(left_neg, right_neg);
+        // todo: change to clearEdges()
     }
 
     private void clear_pos(int left, int right) {
