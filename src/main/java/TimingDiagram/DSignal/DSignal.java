@@ -14,6 +14,9 @@ import javafx.event.EventHandler;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Queue;
+
 import TimingDiagram.SignalController.SignalController;
 import TimingDiagram.DSignal.Edge.Edge;
 
@@ -28,22 +31,26 @@ public class DSignal implements Serializable {
     transient private Pane signalPane;
     transient private Canvas signal;
     transient protected GraphicsContext gc;
-
     transient private TextField name;
 
     // direction checking
     private final DirectionTracker directionTracker;
     // event handling
-    protected boolean release_edge_pos;
+    protected boolean isDragging;
     private final MousePressHandler press_handler;
     private final MouseDragHandler drag_handler;
     private final MouseReleaseHandler release_handler;
-    // edge tracking
-    protected int current_edge;
-    protected int initial_edge;
-    protected final ArrayList<Integer> pos_edges;
-    protected final ArrayList<Integer> neg_edges;
-//    protected final ArrayList<Edge> edges;
+
+    // Used for comparison
+    protected Edge curEdge;
+    // Edge created on mouse press
+    protected Edge pressEdge;
+    // Non-release edge to add
+//    protected Edge edgeToAdd;
+    protected Edge QLeftEdge;
+    protected Edge QRightEdge;
+
+    protected final ArrayList<Edge> edges;
 
     public DSignal(SignalController s) {
         signalController = s;
@@ -56,15 +63,14 @@ public class DSignal implements Serializable {
         // direction checking
         directionTracker = new DirectionTracker();
         // event handling
-        release_edge_pos = false;
+        isDragging = false;
         press_handler = new MousePressHandler(this, directionTracker);
         drag_handler = new MouseDragHandler(this, directionTracker);
         release_handler = new MouseReleaseHandler(this, directionTracker);
-        // data
-        pos_edges = new ArrayList<>();
-        neg_edges = new ArrayList<>();
 
-//        edges = new ArrayList<>();
+        curEdge = new Edge();
+        pressEdge = new Edge();
+        edges = new ArrayList<>();
 
         style();
         format();
@@ -108,16 +114,68 @@ public class DSignal implements Serializable {
     }
 
 // Protected functions: --------------------------------------------------------------
-    // todo: used for edges
-//    protected void addEdge(Edge e) {
-//        edges.add(e);
-//    }
-//
-//    protected void removeEdgeByCoord(double from , double to) {
-//
-//    }
 
-    protected void draw_vertical(int coord) {
+    // Gets index of edge in DSignal.edges
+    protected int edgeIndexOf(Edge e) throws Exception {
+        double coord = e.getCoord();
+        Edge.Type type = e.getType();
+        for (int i = 0; i < edges.size(); i++) {
+            if (edges.get(i).getCoord() == coord && edges.get(i).getType() == type)
+                return i;
+        }
+        return -1;
+//        throw new Exception("findEdgeIndex: no matching edge has been found.");
+    }
+
+    protected void addEdgeAndSort(Edge e) {
+        if (e.getLocation() == Edge.Location.START) {
+            edges.remove(0);
+        }
+        else if (e.getLocation() == Edge.Location.END) {
+            System.out.println("adding end edge");
+            // todo: make sure this works
+//            removeNonDummyEndEdge();
+        }
+
+        if (e.getCoord() < 0) {
+            e.setCoord(-1);
+        }
+        else if (e.getCoord() > getCanvasWidth()) {
+            e.setCoord(getCanvasWidth() + 1);
+            System.out.println("corrected coord");
+        }
+
+        Edge deepCopy = new Edge(e);
+
+        edges.add(deepCopy);
+        sortEdges();
+    }
+
+    protected void sortEdges() {
+        boolean sorted = false;
+        while (!sorted) {
+            sorted = true;
+            for (int i = 0; i < edges.size() - 1; i++) {
+                if (edges.get(i).getCoord() > edges.get(i + 1).getCoord()) {
+                    Collections.swap(edges, i, i + 1);
+                    sorted = false;
+                }
+            }
+        }
+    }
+
+    protected void printEdges() {
+        for (int i = 0; i < edges.size(); i++) {
+            System.out.println("-----" );
+            System.out.println("index: " + i);
+            System.out.println("coord: " + edges.get(i).getCoord());
+            System.out.println("type: " + edges.get(i).getType());
+            System.out.println("location: " + edges.get(i).getLocation());
+            System.out.println("-----");
+        }
+    }
+
+    protected void draw_vertical(double coord) {
         gc.beginPath();
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(signalController.LINE_WIDTH);
@@ -126,7 +184,7 @@ public class DSignal implements Serializable {
         gc.stroke();
     }
 
-    protected void draw_low(int from, int to, DirectionTracker.Direction direction) {
+    protected void draw_low(double from, double to, DirectionTracker.Direction direction) {
         int height = signalController.SIGNAL_HEIGHT;
         int lineWidth = signalController.LINE_WIDTH;
         // draw the line
@@ -136,10 +194,10 @@ public class DSignal implements Serializable {
         gc.stroke();
 
         // erase stuff above the line
-        int rect_x;
+        double rect_x;
         int rect_y = 0;
-        int rect_width;
-        int rect_height = height - lineWidth + 1;
+        double rect_width;
+        double rect_height = height - lineWidth + 1;
         gc.setFill(Color.WHITE);
 
         if (direction == DirectionTracker.Direction.LEFT) { // erase stuff to right
@@ -153,7 +211,7 @@ public class DSignal implements Serializable {
         gc.fillRect(rect_x, rect_y, rect_width, rect_height);
     }
 
-    protected void draw_high(int from, int to, DirectionTracker.Direction direction) {
+    protected void draw_high(double from, double to, DirectionTracker.Direction direction) {
         int lineWidth = signalController.LINE_WIDTH;
         // draw the line
         gc.beginPath();
@@ -162,10 +220,10 @@ public class DSignal implements Serializable {
         gc.stroke();
 
         // erase stuff below the line
-        int rect_x;
-        int rect_y = lineWidth - 1;
-        int rect_width;
-        int rect_height = signalController.SIGNAL_HEIGHT;
+        double rect_x;
+        double rect_y = lineWidth - 1;
+        double rect_width;
+        double rect_height = signalController.SIGNAL_HEIGHT;
         gc.setFill(Color.WHITE);
 
         if (direction == DirectionTracker.Direction.LEFT) { // erase right
@@ -192,6 +250,10 @@ public class DSignal implements Serializable {
         gc.lineTo(canvasWidth, height);
         gc.stroke();
         gc.stroke(); // second stroke makes it more solid
+
+
+        edges.add(new Edge(Edge.Type.NEG, Edge.Location.START, -10));
+        edges.add(new Edge(Edge.Type.POS, Edge.Location.END, canvasWidth + 10));
     }
 
     private void style() {
@@ -219,13 +281,44 @@ public class DSignal implements Serializable {
     // Draws lines on canvas according to saved edges.
     private void draw_from_save() {
         // note: assume edges are balanced
-        init_line();
-        for (int i = 0; i < pos_edges.size(); i++) {
-            int pos = pos_edges.get(i);
-            int neg = neg_edges.get(i);
-            draw_vertical(pos_edges.get(i));
-            draw_vertical(neg_edges.get(i));
-            draw_high(pos, neg, DirectionTracker.Direction.RIGHT);
+//        init_line();
+//        for (int i = 0; i < pos_edges.size(); i++) {
+//            int pos = pos_edges.get(i);
+//            int neg = neg_edges.get(i);
+//            draw_vertical(pos_edges.get(i));
+//            draw_vertical(neg_edges.get(i));
+//            draw_high(pos, neg, DirectionTracker.Direction.RIGHT);
+//        }
+
+        Edge cur, next;
+        for (int i = 0; i < edges.size(); i++) {
+            // todo: check if this is correct
+            cur = edges.get(i);
+            if (cur.getLocation() == Edge.Location.MID) { // edge should be visible
+                draw_vertical(cur.getCoord());
+            }
+            else if (cur.getLocation() == Edge.Location.END) {
+                return;
+            }
+
+            next = edges.get(i + 1);
+            if (cur.getType() == Edge.Type.NEG) {
+                draw_low(cur.getCoord(), next.getCoord(), DirectionTracker.Direction.LEFT);
+            }
+            else { // positive edge
+                draw_high(cur.getCoord(), next.getCoord(), DirectionTracker.Direction.RIGHT);
+            }
+        }
+    }
+
+    private void removeNonDummyEndEdge() {
+        System.out.println("searching");
+        for (int i = edges.size() - 1; i >= 0; i--) {
+            if (edges.get(i).getLocation() == Edge.Location.END /*&& edges.get(i).getType() != Edge.Type.DUMMY*/) {
+                System.out.println("removed");
+                edges.remove(i);
+                return;
+            }
         }
     }
 

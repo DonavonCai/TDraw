@@ -2,8 +2,7 @@ package TimingDiagram.DSignal;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
-
-import java.util.Collections;
+import TimingDiagram.DSignal.Edge.Edge;
 
 class MousePressHandler extends Handler {
 
@@ -13,28 +12,37 @@ class MousePressHandler extends Handler {
 
     @Override
     public void handle(MouseEvent event) {
-        int coord = (int)event.getX();
+        double coord = event.getX();
         if (event.getButton() == MouseButton.PRIMARY) {
-            super.directionTracker.clear_prevDirection();
-            super.directionTracker.set_drawhigh();
-            super.d_sig.initial_edge = coord;
-            super.d_sig.current_edge = coord;
-            if (!super.in_high_signal(coord)) {
-                super.draw_vertical(coord);
-                super.d_sig.pos_edges.add(super.d_sig.current_edge);
-                Collections.sort(super.d_sig.pos_edges);
-            }
+            // Initially assume that the press edge is positive
+            // If the user drags left, then correct in drag handler.
+            d_sig.pressEdge = new Edge(Edge.Type.POS, Edge.Location.MID, coord);
+//            d_sig.edgeToAdd = new Edge(d_sig.pressEdge);
+            d_sig.QLeftEdge = null;
+            d_sig.QRightEdge = null;
+            directionTracker.clear_prevDirection();
+            directionTracker.set_drawhigh();
+            d_sig.pressEdge.setCoord(coord);
+            d_sig.pressEdge.setLocation(Edge.Location.MID); // clicks are only registered in the middle of canvas
+            d_sig.curEdge = new Edge(d_sig.pressEdge);
+            d_sig.isDragging = true;
+            if (!in_high_signal(coord))
+                draw_vertical(coord);
         }
         else if (event.getButton() == MouseButton.SECONDARY) {
-            super.directionTracker.clear_prevDirection();
-            super.directionTracker.set_drawlow();
-            super.d_sig.initial_edge = coord;
-            super.d_sig.current_edge = coord;
-            if (!super.in_low_signal(coord)) {
-                super.draw_vertical(coord);
-                super.d_sig.neg_edges.add(super.d_sig.current_edge);
-                Collections.sort(super.d_sig.neg_edges);
-            }
+            d_sig.pressEdge = new Edge(Edge.Type.NEG, Edge.Location.MID, coord);
+//            d_sig.edgeToAdd = new Edge(d_sig.pressEdge);
+            d_sig.QLeftEdge = null;
+            d_sig.QRightEdge = null;
+            directionTracker.clear_prevDirection();
+            directionTracker.set_drawlow();
+            d_sig.pressEdge.setCoord(coord);
+            d_sig.pressEdge.setType(Edge.Type.NEG);
+            d_sig.pressEdge.setLocation(Edge.Location.MID);
+            d_sig.curEdge = new Edge(d_sig.pressEdge);
+            d_sig.isDragging = true;
+            if (in_high_signal(coord))
+                draw_vertical(coord);
         }
     }
 }

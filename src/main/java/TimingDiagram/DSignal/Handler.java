@@ -1,12 +1,19 @@
 package TimingDiagram.DSignal;
 
 import javafx.scene.input.MouseEvent;
+import TimingDiagram.DSignal.Edge.Edge;
 
 import java.io.Serializable;
 
 abstract class Handler implements Serializable {
     protected DSignal d_sig;
     protected DirectionTracker directionTracker;
+
+    protected enum EdgeOrigin {
+        PRESS,
+        RELEASE,
+        DRAG
+    }
 
     Handler(DSignal d, DirectionTracker t) {
         d_sig = d;
@@ -15,29 +22,44 @@ abstract class Handler implements Serializable {
 
     abstract public void handle(MouseEvent event);
 
-    protected void draw_vertical(int coord) {
+    protected void draw_vertical(double coord) {
         d_sig.draw_vertical(coord);
     }
 
-    protected DirectionTracker.Direction getCurrentDirection() {
-        return directionTracker.current_direction;
+    /* From d_sig.edges, returns index of the first edge
+     * whose coordinate is greater than coord */
+    protected int first_idx_greater_than(int coord) {
+        for (int i = 0; i < d_sig.edges.size(); i++) {
+            if (d_sig.edges.get(i).getCoord() > coord) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /* From d_sig.edges, returns index of the last edge
+    * whose coordinate is less than coord */
+    protected int last_idx_less_than(int coord) {
+        int r = -1;
+        for (int i = 0; i < d_sig.edges.size(); i++) {
+            if (d_sig.edges.get(i).getCoord() < coord) {
+                r = i;
+            }
+        }
+        return r;
     }
 
     // returns true if coord is in between 2 pairs of edges that form a high signal
-    boolean in_high_signal(int coord) {
-        boolean pos_empty = d_sig.pos_edges.size() == 0;
+    boolean in_high_signal(double coord) {
+        Edge leftEdge, rightEdge;
+        // Loop through edges
+        for (int i = 0; i < d_sig.edges.size() - 1; i++) {
+            // get a positive edge, pair it with the next edge
+            if (d_sig.edges.get(i).getType() == Edge.Type.POS) {
+                leftEdge = d_sig.edges.get(i);
+                rightEdge = d_sig.edges.get(i + 1);
 
-        int cur_pos;
-        int cur_neg;
-
-        if (pos_empty && edges_balanced()) { // means there is only a low signal
-            return false;
-        }
-        if (edges_balanced()) { // closing edge only exists if edges are balanced
-            for (int i = 0; i < d_sig.pos_edges.size(); i++) { // find the pair of edges surrounding the edge to be added
-                cur_pos = d_sig.pos_edges.get(i);
-                cur_neg = d_sig.neg_edges.get(i);
-                if (cur_pos <= coord && coord <= cur_neg) {
+                if (leftEdge.getCoord() <= coord && coord <= rightEdge.getCoord()) {
                     return true;
                 }
             }
@@ -45,36 +67,39 @@ abstract class Handler implements Serializable {
         return false;
     }
 
-    // returns true if coord is in the middle of a low signal
-    boolean in_low_signal(int coord) {
-        boolean pos_empty = d_sig.pos_edges.size() == 0;
+    Edge.Type leftNeighborType(double coord) {
+        int idx = last_idx_less_than((int)coord);
 
-        int cur_pos;
-        int cur_neg;
-        if (pos_empty && edges_balanced()) { // pos can be empty with edges unbalanced when erasing a positive edge
-            return true;
-        }
-        if (edges_balanced()) {
-            if (coord <= d_sig.pos_edges.get(0)) { // before first pos edge
-                return true;
-            }
-            for (int i = 0; i < d_sig.neg_edges.size(); i++) { // neg edge at i, corresponding pos edge is at i + 1
-                cur_neg = d_sig.neg_edges.get(i);
-                if (coord >= cur_neg) {
-                    if (i + 1 >= d_sig.pos_edges.size()) { // after last negative edge
-                        return true;
-                    }
-                    cur_pos = d_sig.pos_edges.get(i + 1);
-                    if (coord <= cur_pos) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        if (idx < 0)
+            return null;
+
+        return d_sig.edges.get(idx).getType();
     }
 
-    boolean edges_balanced() {
-        return (d_sig.pos_edges.size() == d_sig.neg_edges.size());
+    Edge.Type leftNeighborType(Edge e) {
+        int idx = last_idx_less_than((int)e.getCoord());
+
+        if (idx < 0)
+            return null;
+
+        return d_sig.edges.get(idx).getType();
+    }
+
+    Edge.Type rightNeighborType(double coord) {
+        int idx = first_idx_greater_than((int)coord);
+
+        if (idx < 0)
+            return null;
+
+        return d_sig.edges.get(idx).getType();
+    }
+
+    Edge.Type rightNeighborType(Edge e) {
+        int idx = first_idx_greater_than((int)e.getCoord());
+
+        if (idx < 0)
+            return null;
+
+        return d_sig.edges.get(idx).getType();
     }
 }
