@@ -6,8 +6,8 @@ import TimingDiagram.DSignal.Edge.Edge;
 
 class MousePressHandler extends Handler {
 
-    MousePressHandler(DSignal d, DirectionTracker t) {
-        super(d, t);
+    MousePressHandler(DSignal d, DirectionTracker t, DragBoundsTracker t2) {
+        super(d, t, t2);
     }
 
     @Override
@@ -17,11 +17,11 @@ class MousePressHandler extends Handler {
             // Initially assume that the press edge is positive
             // If the user drags left, then correct in drag handler.
             d_sig.pressEdge = new Edge(Edge.Type.POS, Edge.Location.MID, coord);
-//            d_sig.edgeToAdd = new Edge(d_sig.pressEdge);
             d_sig.QLeftEdge = null;
             d_sig.QRightEdge = null;
             directionTracker.clear_prevDirection();
             directionTracker.set_drawhigh();
+            directionTracker.erasedLeft = directionTracker.erasedRight = false;
             d_sig.pressEdge.setCoord(coord);
             d_sig.pressEdge.setLocation(Edge.Location.MID); // clicks are only registered in the middle of canvas
             d_sig.curEdge = new Edge(d_sig.pressEdge);
@@ -31,11 +31,11 @@ class MousePressHandler extends Handler {
         }
         else if (event.getButton() == MouseButton.SECONDARY) {
             d_sig.pressEdge = new Edge(Edge.Type.NEG, Edge.Location.MID, coord);
-//            d_sig.edgeToAdd = new Edge(d_sig.pressEdge);
             d_sig.QLeftEdge = null;
             d_sig.QRightEdge = null;
             directionTracker.clear_prevDirection();
             directionTracker.set_drawlow();
+            directionTracker.erasedLeft = directionTracker.erasedRight = false;
             d_sig.pressEdge.setCoord(coord);
             d_sig.pressEdge.setType(Edge.Type.NEG);
             d_sig.pressEdge.setLocation(Edge.Location.MID);

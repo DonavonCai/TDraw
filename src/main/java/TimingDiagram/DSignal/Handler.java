@@ -8,6 +8,7 @@ import java.io.Serializable;
 abstract class Handler implements Serializable {
     protected DSignal d_sig;
     protected DirectionTracker directionTracker;
+    protected DragBoundsTracker dragBoundsTracker;
 
     protected enum EdgeOrigin {
         PRESS,
@@ -15,9 +16,10 @@ abstract class Handler implements Serializable {
         DRAG
     }
 
-    Handler(DSignal d, DirectionTracker t) {
+    Handler(DSignal d, DirectionTracker t, DragBoundsTracker t2) {
         d_sig = d;
         directionTracker = t;
+        dragBoundsTracker = t2;
     }
 
     abstract public void handle(MouseEvent event);
@@ -67,9 +69,16 @@ abstract class Handler implements Serializable {
         return false;
     }
 
+    Edge leftNeighbor(int coord) {
+        int idx = last_idx_less_than((int)coord);
+        if (idx < 0)
+            return null;
+
+        return d_sig.edges.get(idx);
+    }
+
     Edge.Type leftNeighborType(double coord) {
         int idx = last_idx_less_than((int)coord);
-
         if (idx < 0)
             return null;
 
@@ -78,16 +87,22 @@ abstract class Handler implements Serializable {
 
     Edge.Type leftNeighborType(Edge e) {
         int idx = last_idx_less_than((int)e.getCoord());
-
         if (idx < 0)
             return null;
 
         return d_sig.edges.get(idx).getType();
     }
 
+    Edge rightNeighbor(int coord) {
+        int idx = first_idx_greater_than(coord);
+        if (idx < 0)
+            return null;
+
+        return d_sig.edges.get(idx);
+    }
+
     Edge.Type rightNeighborType(double coord) {
         int idx = first_idx_greater_than((int)coord);
-
         if (idx < 0)
             return null;
 
@@ -96,7 +111,6 @@ abstract class Handler implements Serializable {
 
     Edge.Type rightNeighborType(Edge e) {
         int idx = first_idx_greater_than((int)e.getCoord());
-
         if (idx < 0)
             return null;
 

@@ -6,8 +6,8 @@ import TimingDiagram.DSignal.Edge.Edge;
 
 class  MouseReleaseHandler extends Handler {
 
-    MouseReleaseHandler(DSignal d, DirectionTracker t) {
-        super(d, t);
+    MouseReleaseHandler(DSignal d, DirectionTracker t, DragBoundsTracker t2) {
+        super(d, t, t2);
     }
 
     /* On release, decide whether to add 0, 1, or 2 edges from press, drag, release motion */
@@ -22,6 +22,7 @@ class  MouseReleaseHandler extends Handler {
 
         d_sig.isDragging = false;
         directionTracker.reset();
+        dragBoundsTracker.reset();
 
         setLeftAndRightEdges(coord);
 
@@ -36,10 +37,9 @@ class  MouseReleaseHandler extends Handler {
     }
 
     private void setLeftAndRightEdges(double coord) {
-        // prepare QLeftEdge or QRightEdge for adding
+        // prepare QLeftEdge or QRightEdge for adding if null
         if (d_sig.QLeftEdge == null) {
             Edge.Type t;
-
             if (d_sig.QRightEdge == null)
                 d_sig.QRightEdge = new Edge(null, Edge.Location.MID, coord);
 
@@ -48,10 +48,12 @@ class  MouseReleaseHandler extends Handler {
             }
             else {
                 t = Edge.oppositeType(rightNeighborType(d_sig.QRightEdge));
+                System.out.println("t is " + t);
             }
             d_sig.QLeftEdge = new Edge(t, Edge.Location.MID, coord);
         }
         else if (d_sig.QRightEdge == null) {
+            System.out.println("QRight is null");
             Edge.Type t;
             if (d_sig.QLeftEdge == null)
                 d_sig.QLeftEdge = new Edge(null, Edge.Location.MID, coord);

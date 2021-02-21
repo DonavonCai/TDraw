@@ -10,6 +10,7 @@ public class Edge implements Serializable {
     private Location location;
     private double coord;
 
+    // constructors
     public Edge() {}
 
     public Edge(Type t, Location loc, double c) {
@@ -18,13 +19,13 @@ public class Edge implements Serializable {
         coord = c;
     }
 
-    // deep copy
     public Edge(Edge copy) {
         type = copy.getType();
         location = copy.getLocation();
         coord = copy.getCoord();
     }
 
+    // other functions
     public void copy(Edge e) {
         type = e.getType();
         location = e.getLocation();

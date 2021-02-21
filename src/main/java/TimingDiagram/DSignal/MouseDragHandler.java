@@ -7,8 +7,8 @@ import TimingDiagram.DSignal.Edge.Edge;
 
 class MouseDragHandler extends Handler {
 
-    MouseDragHandler(DSignal d, DirectionTracker t) {
-        super(d, t);
+    MouseDragHandler(DSignal d, DirectionTracker t, DragBoundsTracker t2) {
+        super(d, t, t2);
     }
 
     @Override
@@ -41,22 +41,54 @@ class MouseDragHandler extends Handler {
             handleDirectionChange(event);
         }
 
-        // Continuously draw vertical line as mouse as dragged, as long as the line is valid.
-        // FIXME: draws vertical line on direction change in the middle of signal
-        if (leftClick) {
-            // If moving left, then the mouse is dragging a positive edge
-            if (directionTracker.movingLeft() && leftNeighborType(coord) == Edge.Type.NEG)
-                draw_vertical(coord);
+        dragBoundsTracker.updateBounds(event, leftNeighbor(coord), rightNeighbor(coord));
+        dragVerticalLine(coord, leftClick, rightClick);
 
-            // If moving right, then mouse is dragging a negative edge
-            else if (directionTracker.movingRight() && rightNeighborType(coord) == Edge.Type.POS)
-                draw_vertical(coord);
+        clear_covered_edges(event);
+
+        // update previous direction
+        directionTracker.previous_direction = directionTracker.current_direction;
+        directionTracker.setPrevCoord(coord);
+    }
+
+    // Helper functions: ----------------------------------------------------------------------
+    // Continuously draw vertical line as mouse as dragged, as long as the line is valid.
+    private void dragVerticalLine(int coord, boolean leftClick, boolean rightClick) {
+        boolean positiveLeftNeighbor = leftNeighborType(coord) == Edge.Type.POS;
+        boolean negativeLeftNeighbor = !positiveLeftNeighbor;
+        boolean pastLeftMost = coord <= dragBoundsTracker.getLeftMost();
+        boolean pastRightMost = coord >= dragBoundsTracker.getRightMost();
+
+        if (leftClick) {
+            // Either no edges erased, or both left and right erased.
+            // In any case, edges are balanced, so draw a vertical line if left neighbor is a negative edge.
+            if (leftNeighborType(coord) != rightNeighborType(coord)) {
+                if (negativeLeftNeighbor && (pastRightMost || pastLeftMost)) {
+                    draw_vertical(coord);
+                }
+            }
+            // Only one of the edges has been erased, must find out which one.
+            else {
+                if (directionTracker.erasedLeft && pastLeftMost) {
+                    draw_vertical(coord);
+                }
+                else if (directionTracker.erasedRight && pastRightMost) {
+                    draw_vertical(coord);
+                }
+            }
         }
         else {
-            if (directionTracker.movingLeft() && leftNeighborType(coord) == Edge.Type.POS)
-                draw_vertical(coord);
-            else if (directionTracker.movingRight() && rightNeighborType(coord) == Edge.Type.NEG)
-                draw_vertical(coord);
+            if (leftNeighborType(coord) != rightNeighborType(coord)) {
+                if (positiveLeftNeighbor && (pastRightMost || pastLeftMost)) {
+                    draw_vertical(coord);
+                }
+            }
+            else {
+                if (directionTracker.erasedLeft && pastLeftMost)
+                    draw_vertical(coord);
+                else if (directionTracker.erasedRight && pastRightMost)
+                    draw_vertical(coord);
+            }
         }
 
         // Extend the signal to where the mouse is dragged.
@@ -64,69 +96,64 @@ class MouseDragHandler extends Handler {
             d_sig.draw_high(d_sig.curEdge.getCoord(), coord, directionTracker.current_direction);
         else
             d_sig.draw_low(d_sig.curEdge.getCoord(), coord, directionTracker.current_direction);
-
-        clear_covered_edges(event);
-
-        // update previous direction
-        directionTracker.previous_direction = directionTracker.current_direction;
-        directionTracker.prevCoord = coord;
     }
 
-    // Helper functions: ----------------------------------------------------------------------
-    // FIXME: don't overwrite left/right edge if in middle of signal
     private void handleDirectionChange(MouseEvent event) {
         int coord = (int)event.getX();
         d_sig.curEdge.setCoord(coord);
 
-//        boolean inHigh = in_high_signal(coord);
         boolean inHigh = (leftNeighborType(coord) == Edge.Type.POS);
         boolean rightToLeft = (directionTracker.previous_direction == DirectionTracker.Direction.RIGHT);
+        boolean edgeErased = directionTracker.erasedLeft || directionTracker.erasedRight;
 
-        if (event.getButton() == MouseButton.PRIMARY && !inHigh) {
+        if (event.getButton() == MouseButton.PRIMARY && (!inHigh || edgeErased)) {
             d_sig.curEdge.calculateLocation(d_sig.getCanvasWidth());
             if (rightToLeft) {
                 d_sig.curEdge.setType(Edge.Type.NEG);
-//                d_sig.edgeToAdd.copy(d_sig.curEdge);
                 if (d_sig.QRightEdge == null)
                     d_sig.QRightEdge = new Edge(Edge.Type.NEG, Edge.Location.MID, coord);
-                else if (d_sig.QRightEdge.getCoord() < coord)
+                else if (d_sig.QRightEdge.getCoord() < coord) {
                     d_sig.QRightEdge.setCoord(coord);
+                    d_sig.QLeftEdge.setType(Edge.Type.NEG);
+                }
             }
-            // left to right
-            else {
+            else { // left to right
                 d_sig.curEdge.setType(Edge.Type.POS);
-//                d_sig.edgeToAdd.copy(d_sig.curEdge);
                 if (d_sig.QLeftEdge == null)
                     d_sig.QLeftEdge = new Edge(Edge.Type.POS, Edge.Location.MID, coord);
-                else if (d_sig.QLeftEdge.getCoord() > coord)
+                else if (coord < d_sig.QLeftEdge.getCoord()) {
                     d_sig.QLeftEdge.setCoord(coord);
+                    d_sig.QLeftEdge.setType(Edge.Type.POS);
+                }
             }
         }
-        else if (event.getButton() == MouseButton.SECONDARY && inHigh) {
+        else if (event.getButton() == MouseButton.SECONDARY && (inHigh || edgeErased)) {
             d_sig.curEdge.calculateLocation(d_sig.getCanvasWidth());
             if (rightToLeft) {
                 d_sig.curEdge.setType(Edge.Type.POS);
-//                d_sig.edgeToAdd.copy(d_sig.curEdge);
                 if (d_sig.QRightEdge == null)
                     d_sig.QRightEdge = new Edge(Edge.Type.POS, Edge.Location.MID, coord);
-                else if (d_sig.QRightEdge.getCoord() < coord)
+                else if (d_sig.QRightEdge.getCoord() < coord) {
                     d_sig.QRightEdge.setCoord(coord);
+                    d_sig.QLeftEdge.setType(Edge.Type.POS);
+                }
             }
             else {
                 d_sig.curEdge.setType(Edge.Type.NEG);
-//                d_sig.edgeToAdd.copy((d_sig.curEdge));
                 if (d_sig.QLeftEdge == null)
                     d_sig.QLeftEdge = new Edge(Edge.Type.NEG, Edge.Location.MID, coord);
-                else if (d_sig.QLeftEdge.getCoord() > coord)
+                else if (coord < d_sig.QLeftEdge.getCoord()) {
                     d_sig.QLeftEdge.setCoord(coord);
+                    d_sig.QLeftEdge.setType(Edge.Type.NEG);
+                }
             }
         }
     }
 
     private void initialLeftMove(MouseEvent event) {
-        System.out.println("initial left move");
         int coord = (int)event.getX();
         directionTracker.initial_direction = DirectionTracker.Direction.LEFT;
+        dragBoundsTracker.setRightMost(coord);
 
         d_sig.QRightEdge = new Edge();
         d_sig.QRightEdge.setLocation(Edge.Location.MID);
@@ -134,15 +161,11 @@ class MouseDragHandler extends Handler {
 
         // If moving left on a left click, then the press edge is negative.
         if (event.getButton() == MouseButton.PRIMARY) {
-            // fixme: drag left in high signal, condition wrong?
             if (!in_high_signal(coord)) {
                 d_sig.pressEdge.setType(Edge.Type.NEG);
                 d_sig.curEdge.copy(d_sig.pressEdge);
-
-                // We now have a right edge
-//                d_sig.edgeToAdd.copy(d_sig.pressEdge);
+                // Queue up a right edge
                 d_sig.QRightEdge.setType(Edge.Type.NEG);
-//                System.out.println("EDGE TO ADD IS: " + d_sig.edgeToAdd.getType());
             }
         }
         // If moving left on right click, press edge is positive.
@@ -150,8 +173,6 @@ class MouseDragHandler extends Handler {
             if (in_high_signal(coord)) {
                 d_sig.pressEdge.setType(Edge.Type.POS);
                 d_sig.curEdge.copy(d_sig.pressEdge);
-
-//                d_sig.edgeToAdd.copy(d_sig.pressEdge);
                 d_sig.QRightEdge.setType(Edge.Type.POS);
             }
         }
@@ -160,6 +181,7 @@ class MouseDragHandler extends Handler {
     private void initialRightMove(MouseEvent event) {
         int coord = (int)event.getX();
         directionTracker.initial_direction = DirectionTracker.Direction.RIGHT;
+        dragBoundsTracker.setLeftMost(coord);
 
         d_sig.QLeftEdge = new Edge();
         d_sig.QLeftEdge.setLocation(Edge.Location.MID);
@@ -170,9 +192,6 @@ class MouseDragHandler extends Handler {
             if (!in_high_signal(coord)) {
                 d_sig.pressEdge.setType(Edge.Type.POS);
                 d_sig.curEdge.copy(d_sig.pressEdge);
-
-                // We now have a right edge
-//                d_sig.edgeToAdd.copy(d_sig.pressEdge);
                 d_sig.QLeftEdge.setType(Edge.Type.POS);
             }
         }
@@ -181,37 +200,48 @@ class MouseDragHandler extends Handler {
             if (in_high_signal(coord)) {
                 d_sig.pressEdge.setType(Edge.Type.NEG);
                 d_sig.curEdge.copy(d_sig.pressEdge);
-
-//                d_sig.edgeToAdd.copy(d_sig.pressEdge);
                 d_sig.QLeftEdge.setType(Edge.Type.NEG);
             }
         }
     }
 
+    // NOTE: Java's sublist.clear is (inclusive, exclusive)
+    // This is accounted for in the helper function clearEdges().
+    // Here, make sure left and right are BOTH inclusive.
     private void clear_covered_edges(MouseEvent event) {
         // fixme: erasing the dummy edge
-        int left;
-        int right;
+        int left, right;
+        boolean checkedLeft = false;
+        boolean checkedRight = false;
         int curr = (int)event.getX();
 
-        // Erase on left side of mouse
+        // Erase on left side of mouse (moving right)
         if (d_sig.curEdge.getCoord() <= curr) {
-            // get range of edges to delete
-            left = first_idx_greater_than((int)d_sig.curEdge.getCoord());
+            // erase everything up to the
             right = last_idx_less_than(curr);
+            left = first_idx_greater_than((int)d_sig.curEdge.getCoord());
+            checkedRight = true;
         }
-        // Erase on right side of mouse
+        // Erase on right side of mouse (moving left)
         else {
             left = first_idx_greater_than(curr);
             right = last_idx_less_than((int)d_sig.curEdge.getCoord());
+            checkedLeft = true;
         }
         // avoid erasing start and end edges
         if (left <= 0)
             left = 1;
-        // note: sublist() is (inclusive, exclusive)
         if (right >= d_sig.edges.size() - 1)
             right = d_sig.edges.size() - 2;
 
+        if (checkedLeft && left <= right) {
+            System.out.println("erased left");
+            directionTracker.erasedLeft = true;
+        }
+        else if (checkedRight && left <= right){
+            System.out.println("erased right");
+            directionTracker.erasedRight = true;
+        }
         clearEdges(left, right);
     }
 

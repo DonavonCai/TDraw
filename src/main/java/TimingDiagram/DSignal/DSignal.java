@@ -15,7 +15,6 @@ import javafx.event.EventHandler;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Queue;
 
 import TimingDiagram.SignalController.SignalController;
 import TimingDiagram.DSignal.Edge.Edge;
@@ -35,6 +34,7 @@ public class DSignal implements Serializable {
 
     // direction checking
     private final DirectionTracker directionTracker;
+    private final DragBoundsTracker dragBoundsTracker;
     // event handling
     protected boolean isDragging;
     private final MousePressHandler press_handler;
@@ -46,7 +46,6 @@ public class DSignal implements Serializable {
     // Edge created on mouse press
     protected Edge pressEdge;
     // Non-release edge to add
-//    protected Edge edgeToAdd;
     protected Edge QLeftEdge;
     protected Edge QRightEdge;
 
@@ -62,11 +61,12 @@ public class DSignal implements Serializable {
         diagram = new HBox();
         // direction checking
         directionTracker = new DirectionTracker();
+        dragBoundsTracker = new DragBoundsTracker();
         // event handling
         isDragging = false;
-        press_handler = new MousePressHandler(this, directionTracker);
-        drag_handler = new MouseDragHandler(this, directionTracker);
-        release_handler = new MouseReleaseHandler(this, directionTracker);
+        press_handler = new MousePressHandler(this, directionTracker, dragBoundsTracker);
+        drag_handler = new MouseDragHandler(this, directionTracker, dragBoundsTracker);
+        release_handler = new MouseReleaseHandler(this, directionTracker, dragBoundsTracker);
 
         curEdge = new Edge();
         pressEdge = new Edge();
@@ -116,7 +116,7 @@ public class DSignal implements Serializable {
 // Protected functions: --------------------------------------------------------------
 
     // Gets index of edge in DSignal.edges
-    protected int edgeIndexOf(Edge e) throws Exception {
+    protected int edgeIndexOf(Edge e) {
         double coord = e.getCoord();
         Edge.Type type = e.getType();
         for (int i = 0; i < edges.size(); i++) {
@@ -124,7 +124,6 @@ public class DSignal implements Serializable {
                 return i;
         }
         return -1;
-//        throw new Exception("findEdgeIndex: no matching edge has been found.");
     }
 
     protected void addEdgeAndSort(Edge e) {
