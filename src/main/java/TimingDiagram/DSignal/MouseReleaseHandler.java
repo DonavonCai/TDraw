@@ -75,22 +75,39 @@ class  MouseReleaseHandler extends Handler {
          * Otherwise, if QLeftEdge is positive, then there are 2 positive edges in a row (illegal)...
          * And if QLeftEdge is negative, then the left click will be lowering the signal (not what user wants) */
         if (leftClick) {
-            if (d_sig.QLeftEdge.getType() != leftNeighborType(d_sig.QLeftEdge) && leftNeighborType(d_sig.QLeftEdge) == Edge.Type.NEG)
+            if (d_sig.QLeftEdge.getType() != leftNeighborType(d_sig.QLeftEdge) &&
+                leftNeighborType(d_sig.QLeftEdge) == Edge.Type.NEG)
+            {
                 d_sig.addEdgeAndSort(d_sig.QLeftEdge);
+            }
         }
         // And vice versa for a right click:
         else if (rightClick) {
-            if (d_sig.QLeftEdge.getType() != leftNeighborType(d_sig.QLeftEdge) && leftNeighborType(d_sig.QLeftEdge) == Edge.Type.POS)
+            if (d_sig.QLeftEdge.getType() != leftNeighborType(d_sig.QLeftEdge) &&
+                leftNeighborType(d_sig.QLeftEdge) == Edge.Type.POS)
+            {
                 d_sig.addEdgeAndSort(d_sig.QLeftEdge);
+            }
         }
 
         // Now add the right edge:
         if (d_sig.QRightEdge.getType() != rightNeighborType(d_sig.QRightEdge)) {
-            if (d_sig.QRightEdge.getType() == Edge.Type.POS && leftNeighborType(d_sig.QRightEdge) == rightNeighborType(d_sig.QRightEdge))
+            if (d_sig.QRightEdge.getType() == Edge.Type.POS &&
+                leftNeighborType(d_sig.QRightEdge) == rightNeighborType(d_sig.QRightEdge))
+            {
+                System.out.println("added QRight");
                 d_sig.addEdgeAndSort(d_sig.QRightEdge);
+            }
 
-            else if (d_sig.QRightEdge.getType() == Edge.Type.NEG && leftNeighborType(d_sig.QRightEdge) == rightNeighborType(d_sig.QRightEdge))
+            else if (d_sig.QRightEdge.getType() == Edge.Type.NEG &&
+                leftNeighborType(d_sig.QRightEdge) == rightNeighborType(d_sig.QRightEdge))
+            {
+                System.out.println("added QRight (else)");
                 d_sig.addEdgeAndSort(d_sig.QRightEdge);
+            }
+            else {
+                System.out.println("didn't add QRight");
+            }
         }
     }
 

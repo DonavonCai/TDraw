@@ -61,7 +61,7 @@ public class DSignal implements Serializable {
         diagram = new HBox();
         // direction checking
         directionTracker = new DirectionTracker();
-        dragBoundsTracker = new DragBoundsTracker();
+        dragBoundsTracker = new DragBoundsTracker(this);
         // event handling
         isDragging = false;
         press_handler = new MousePressHandler(this, directionTracker, dragBoundsTracker);

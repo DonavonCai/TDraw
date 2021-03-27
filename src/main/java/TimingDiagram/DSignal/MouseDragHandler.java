@@ -100,27 +100,37 @@ class MouseDragHandler extends Handler {
 
     private void handleDirectionChange(MouseEvent event) {
         int coord = (int)event.getX();
+
+//        dragBoundsTracker.directionChange(coord);
         d_sig.curEdge.setCoord(coord);
 
         boolean inHigh = (leftNeighborType(coord) == Edge.Type.POS);
-        boolean rightToLeft = (directionTracker.previous_direction == DirectionTracker.Direction.RIGHT);
+        boolean rightToLeft = (directionTracker.current_direction == DirectionTracker.Direction.LEFT);
         boolean edgeErased = directionTracker.erasedLeft || directionTracker.erasedRight;
 
         if (event.getButton() == MouseButton.PRIMARY && (!inHigh || edgeErased)) {
             d_sig.curEdge.calculateLocation(d_sig.getCanvasWidth());
             if (rightToLeft) {
                 d_sig.curEdge.setType(Edge.Type.NEG);
-                if (d_sig.QRightEdge == null)
+                if (d_sig.QRightEdge == null) {
                     d_sig.QRightEdge = new Edge(Edge.Type.NEG, Edge.Location.MID, coord);
+                    System.out.println("right to left: added new QRight");
+                }
                 else if (d_sig.QRightEdge.getCoord() < coord) {
                     d_sig.QRightEdge.setCoord(coord);
                     d_sig.QLeftEdge.setType(Edge.Type.NEG);
+                    System.out.println("right to left: updated QRight to: " + coord);
+                }
+                else {
+                    System.out.println("QRight: " + d_sig.QRightEdge.getCoord() + ", coord: " + coord);
                 }
             }
             else { // left to right
                 d_sig.curEdge.setType(Edge.Type.POS);
-                if (d_sig.QLeftEdge == null)
+                if (d_sig.QLeftEdge == null) {
                     d_sig.QLeftEdge = new Edge(Edge.Type.POS, Edge.Location.MID, coord);
+                    System.out.println("left to right: added new QLeft");
+                }
                 else if (coord < d_sig.QLeftEdge.getCoord()) {
                     d_sig.QLeftEdge.setCoord(coord);
                     d_sig.QLeftEdge.setType(Edge.Type.POS);
@@ -151,16 +161,24 @@ class MouseDragHandler extends Handler {
     }
 
     private void initialLeftMove(MouseEvent event) {
+        System.out.println("initial left move");
         int coord = (int)event.getX();
+        boolean leftClick = event.getButton() == MouseButton.PRIMARY;
         directionTracker.initial_direction = DirectionTracker.Direction.LEFT;
-        dragBoundsTracker.setRightMost(coord);
 
-        d_sig.QRightEdge = new Edge();
-        d_sig.QRightEdge.setLocation(Edge.Location.MID);
-        d_sig.QRightEdge.setCoord(coord);
+        // Queue up a right edge only if the press creates a new edge.
+        // Don't queue up a right edge if the press doesn't create a new edge.
+        // left click in high signal => QRight is null
+        // right click in low signal => QRight is null
+        if ((leftClick && !in_high_signal(coord)) || (!leftClick && in_high_signal(coord))) {
+            dragBoundsTracker.setRightMost(coord);
+            d_sig.QRightEdge = new Edge();
+            d_sig.QRightEdge.setLocation(Edge.Location.MID);
+            d_sig.QRightEdge.setCoord(coord);
+        }
 
         // If moving left on a left click, then the press edge is negative.
-        if (event.getButton() == MouseButton.PRIMARY) {
+        if (leftClick) {
             if (!in_high_signal(coord)) {
                 d_sig.pressEdge.setType(Edge.Type.NEG);
                 d_sig.curEdge.copy(d_sig.pressEdge);
@@ -168,8 +186,8 @@ class MouseDragHandler extends Handler {
                 d_sig.QRightEdge.setType(Edge.Type.NEG);
             }
         }
-        // If moving left on right click, press edge is positive.
-        else if (event.getButton() == MouseButton.SECONDARY) {
+        // Right click
+        else {
             if (in_high_signal(coord)) {
                 d_sig.pressEdge.setType(Edge.Type.POS);
                 d_sig.curEdge.copy(d_sig.pressEdge);
@@ -179,28 +197,37 @@ class MouseDragHandler extends Handler {
     }
 
     private void initialRightMove(MouseEvent event) {
+        System.out.println("initial right move");
         int coord = (int)event.getX();
+        boolean leftClick = event.getButton() == MouseButton.PRIMARY;
         directionTracker.initial_direction = DirectionTracker.Direction.RIGHT;
-        dragBoundsTracker.setLeftMost(coord);
 
-        d_sig.QLeftEdge = new Edge();
-        d_sig.QLeftEdge.setLocation(Edge.Location.MID);
-        d_sig.QLeftEdge.setCoord(coord);
+        // Queue up a left edge only if the press creates a new edge.
+        // Don't queue up a left edge if the press doesn't create a new edge.
+        // left click in high signal => QLeft is null
+        // right click in low signal => QLeft is null
+        if ((leftClick && !in_high_signal(coord)) || (!leftClick && in_high_signal(coord))) {
+            dragBoundsTracker.setLeftMost(coord);
+            d_sig.QLeftEdge = new Edge();
+            d_sig.QLeftEdge.setLocation(Edge.Location.MID);
+            d_sig.QLeftEdge.setCoord(coord);
+        }
 
-        // If moving right on a left click, then the press edge is positive.
-        if (event.getButton() == MouseButton.PRIMARY) {
+        if (leftClick) {
             if (!in_high_signal(coord)) {
                 d_sig.pressEdge.setType(Edge.Type.POS);
                 d_sig.curEdge.copy(d_sig.pressEdge);
-                d_sig.QLeftEdge.setType(Edge.Type.POS);
+                if (d_sig.QLeftEdge != null)
+                    d_sig.QLeftEdge.setType(Edge.Type.POS);
             }
         }
-        // If moving right on right click, press edge is negative.
-        else if (event.getButton() == MouseButton.SECONDARY) {
+        // Right click
+        else {
             if (in_high_signal(coord)) {
                 d_sig.pressEdge.setType(Edge.Type.NEG);
                 d_sig.curEdge.copy(d_sig.pressEdge);
-                d_sig.QLeftEdge.setType(Edge.Type.NEG);
+                if (d_sig.QLeftEdge != null)
+                    d_sig.QLeftEdge.setType(Edge.Type.NEG);
             }
         }
     }
