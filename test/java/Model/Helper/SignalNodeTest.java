@@ -2,9 +2,11 @@ package Model.Helper;
 
 import Model.Signal;
 import Model.Edge;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.*;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Nested;
+//import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +22,7 @@ class SignalNodeTest {
 
     @Nested
     @DisplayName("Set Type")
-    class testType {
+    class Type {
         @DisplayName("Low signal")
         @Test
         void lowSignal() {
@@ -51,21 +53,38 @@ class SignalNodeTest {
             @Nested
             @DisplayName("In order: (25-50, high); (50-75, low); (75-100, high);")
             class InOrder {
+                Signal root;
+                Signal a;
+                Signal b;
+                Signal c;
+
+                SignalNode rootNode;
+                SignalNode nodeA;
+                SignalNode nodeB;
+                SignalNode nodeC;
+
+                @BeforeEach
+                void initTest() {
+                    root = new Signal(0, 1000, Signal.Type.LOW);
+                    a = new Signal(25, 50, Signal.Type.HIGH);
+                    b = new Signal(50, 75, Signal.Type.LOW);
+                    c = new Signal (75, 100, Signal.Type.HIGH);
+
+                    rootNode = new SignalNode(root);
+                    nodeA = new SignalNode(a);
+                    nodeB = new SignalNode(b);
+                    nodeC = new SignalNode(c);
+
+                    rootNode.Insert(nodeA);
+                    rootNode.Insert(nodeB);
+                    rootNode.Insert(nodeC);
+                }
+
                 @DisplayName("Coords in order")
                 @Test
                 void testCoords() {
-                    Signal s = new Signal(0, 1000, Signal.Type.LOW);
-                    Signal s2 = new Signal(25, 50, Signal.Type.HIGH);
-                    Signal s3 = new Signal(50, 75, Signal.Type.LOW);
-                    Signal s4 = new Signal (75, 100, Signal.Type.HIGH);
-
-                    SignalNode test = new SignalNode(s);
-                    test.Insert(new SignalNode(s2));
-                    test.Insert(new SignalNode(s3));
-                    test.Insert(new SignalNode(s4));
-
                     Integer[] expected = {0, 25, 50, 50, 75, 75, 100, 1000};
-                    Integer[] actual = test.CoordsInOrder().toArray(new Integer[0]);
+                    Integer[] actual = rootNode.CoordsInOrder().toArray(new Integer[0]);
 
                     assertArrayEquals(expected, actual);
                 }
@@ -73,22 +92,8 @@ class SignalNodeTest {
                 @DisplayName("Node positions")
                 @Test
                 void testNodes() {
-                    Signal root = new Signal(0, 1000, Signal.Type.LOW);
-                    Signal s2 = new Signal(25, 50, Signal.Type.HIGH);
-                    Signal s3 = new Signal(50, 75, Signal.Type.LOW);
-                    Signal s4 = new Signal (75, 100, Signal.Type.HIGH);
-
-                    SignalNode s2Node = new SignalNode(s2);
-                    SignalNode s3Node = new SignalNode(s3);
-                    SignalNode s4Node = new SignalNode(s4);
-
-                    SignalNode test = new SignalNode(root);
-                    test.Insert(s2Node);
-                    test.Insert(s3Node);
-                    test.Insert(s4Node);
-
-                    SignalNode[] root_expected = {s2Node, s3Node, s4Node};
-                    SignalNode[] root_actual = test.GetChildren().toArray(new SignalNode[0]);
+                    SignalNode[] root_expected = {nodeA, nodeB, nodeC};
+                    SignalNode[] root_actual = rootNode.GetChildren().toArray(new SignalNode[0]);
 
                     assertArrayEquals(root_expected, root_actual);
                 }
@@ -236,18 +241,29 @@ class SignalNodeTest {
     }
 
     @Nested
-    @DisplayName("Extend signals")
-    class Merge {
-        @Test
-        @DisplayName("Extend single high signal")
-        void testOne() {
-            Signal root = new Signal(0, 1000, Signal.Type.LOW);
-            Signal a = new Signal(25, 50, Signal.Type.HIGH);
+    @DisplayName("Dragging")
+    class Dragging {
+        @Nested
+        @DisplayName("Extension")
+        class Extension {
+            @Nested
+            @DisplayName("Single Signal")
+            class Single {
+                @Test
+                @DisplayName("High signal")
+                void testOne() {
+                    Signal root = new Signal(0, 1000, Signal.Type.LOW);
+                    Signal a = new Signal(25, 50, Signal.Type.HIGH);
 
-            SignalNode rootNode = new SignalNode(root);
-            rootNode.Insert(new SignalNode(a));
+                    SignalNode rootNode = new SignalNode(root);
+                    rootNode.Insert(new SignalNode(a));
 
-            // todo: extend
+                    Integer[] expected = {0, 25, 50, 1000};
+                    Integer[] actual = rootNode.CoordsInOrder().toArray(new Integer[0]);
+
+                    // todo: extend
+                }
+            }
         }
     }
 }
