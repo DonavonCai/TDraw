@@ -1,22 +1,20 @@
 package Model;
 
-import Model.Helper.SignalTree;
-
 import View.View;
 
 // This class provides the interface that the controller will use to update the model.
 
 public class DiagramModel {
     private View view;
-    private SignalTree tree;
+//    private SignalTree tree;
 
     public void SetView(View v) {
         view = v;
     }
 
-    public void SetTree(SignalTree t) {
-        tree = t;
-    }
+//    public void SetTree(SignalTree t) {
+//        tree = t;
+//    }
 
     public DiagramModel() {
 

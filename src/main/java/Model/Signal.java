@@ -1,144 +1,130 @@
 package Model;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Collections;
 
-/* A signal is a pair of Edges. The type of signal depends on the type of the left hand edge.
- * e.g. A (positive, negative) pair of edges is a high signal, and (negative, positive) is a low signal.
- *
- * Each signal has a set of children, which are other signals enclosed by the parent, forming a tree of signals, composing the diagram.
- * The immediate children of each signal must be of the opposite type to be valid.
- */
 public class Signal {
     public enum Type {HIGH, LOW};
 
-    // Data: -------------------------------------------------------------
-    Type type;
-    private Edge leftEdge;
-    private Edge rightEdge;
+    private int pivot;
+    private int leftBound;
+    private int rightBound;
+    private ArrayList<Edge> edges;
 
-    // Setters and getters: ----------------------------------------------
-    public Type GetType() {
-        return type;
+    // Setters and getters: ---------------------------
+    public ArrayList<Edge> GetEdges() {
+        return edges;
     }
 
-    public Edge GetLeftEdge() { return leftEdge; }
-
-    public int GetLeftCoord() { return leftEdge.GetCoord(); }
-
-    public Edge GetRightEdge() { return rightEdge; }
-
-    public int GetRightCoord() { return rightEdge.GetCoord(); }
-
-    public void SetLeftEdge(Edge left) { leftEdge = left; }
-
-    public void SetRightEdge(Edge right) { rightEdge = right; }
-
-    public void SetCoords(int left, int right) {
-        leftEdge.SetCoord(left);
-        rightEdge.SetCoord(right);
+    public void SetPivot(int coord) {
+        pivot = coord;
     }
 
-    public void SetLeftCoord(int coord) {
-        leftEdge.SetCoord(coord);
-    }
-
-    public void SetRightCoord(int coord) {
-        rightEdge.SetCoord(coord);
-    }
-
-    public void SetLeftType(Edge.Type t) { leftEdge.SetType(t); }
-
-    public void SetRightType(Edge.Type t) { rightEdge.SetType(t); }
-
-    // Constructors: -----------------------------------------------------
+    // Constructors: ----------------------------------
     public Signal() {
-        leftEdge = rightEdge = null;
+        edges = new ArrayList<Edge>();
     }
 
-    // copy constructor. use 'new' for non-primitives
-    public Signal(Signal s) {
-        leftEdge = new Edge(s.GetLeftEdge());
-        rightEdge = new Edge(s.GetRightEdge());
-        type = s.type;
+    public Signal(ArrayList<Edge> arr) {
+        edges = arr;
     }
 
-    public Signal(int c) {
-        leftEdge = new Edge(c);
-        rightEdge = new Edge(c);
+    // Interface: -------------------------------------
+    public void Init(Edge left, Edge right) {
+        assert edges != null;
+        leftBound = left.GetCoord();
+        rightBound = right.GetCoord();
+        edges.add(left);
+        edges.add(right);
+        // todo: sort?
     }
 
-    public Signal(int left, int right) {
-        leftEdge = new Edge(left);
-        rightEdge = new Edge(right);
+    public void Create(Signal.Type signalType, int c) {
+        Edge e = new Edge(c);
+        e.SetType(LeftEdgeType(signalType));
+
+        SetPivot(c);
+        InsertEdge(e);
     }
 
-    public Signal(int left, int right, Type t) {
-        leftEdge = new Edge(left);
-        rightEdge = new Edge(right);
-        SetType(t);
-    }
+    // Extend the signal from pivot to coord.
+    // If any edges are in-between pivot and coord, delete them.
+    public void Extend(int coord) {
+        // (exclusive, exclusive) range delete
+        DeleteEdgesInRange(pivot, coord);
 
-    public Signal(Edge left) {
-        leftEdge = left;
-        type = (left.GetType() == Edge.Type.POS)? Type.HIGH : Type.LOW;
-        rightEdge = null;
-    }
-
-    public Signal(Edge left, Edge right) {
-        leftEdge = left;
-        rightEdge = right;
-        type = (left.GetType() == Edge.Type.POS)? Type.HIGH : Type.LOW;
-    }
-
-    // Interface: --------------------------------------------------------
-
-    // Sets this.type, also assigns types to left and right edges accordingly
-    public void SetType(Type t) {
-        if (t == Signal.Type.HIGH) {
-            leftEdge.SetType(Edge.Type.POS);
-            rightEdge.SetType(Edge.Type.NEG);
+        // If an edge already exists at coord, stop
+        if (EdgesIndexOf(coord) >= 0) {
+            return;
         }
-        else {
-            leftEdge.SetType(Edge.Type.NEG);
-            rightEdge.SetType(Edge.Type.POS);
-        }
+
+        int pivotIdx = EdgesIndexOf(pivot);
+        assert pivotIdx >= 0;
+
+        Edge.Type type = edges.get(pivotIdx).GetType().opposite();
+        InsertEdge(new Edge(coord, type));
     }
 
-    public void SwapEdges() {
-        Edge temp = leftEdge;
-        leftEdge = rightEdge;
-        rightEdge = temp;
+    // Sets the pivot edge's type to the opposite type
+    public void Flip() {
+        int pivotIdx = EdgesIndexOf(pivot);
+        assert pivotIdx >= 0;
+
+        Edge.Type newType = edges.get(pivotIdx).GetType().opposite();
+        edges.get(pivotIdx).SetType(newType);
     }
 
-    public boolean Encloses(int coord) {
-        assert leftEdge != null;
-        assert rightEdge != null;
-        assert leftEdge.GetCoord() <= rightEdge.GetCoord();
-        return (leftEdge.GetCoord() <= coord && coord <= rightEdge.GetCoord());
-    }
-
-    public boolean Encloses(Signal s) {
-        assert leftEdge != null;
-        assert rightEdge != null;
-        assert leftEdge.GetCoord() <= rightEdge.GetCoord();
-        return (this.leftEdge.GetCoord() <= s.GetLeftCoord() && s.GetRightCoord() <= this.rightEdge.GetCoord());
-    }
-
-    public boolean RightOf(Signal s) {
-        assert s != null;
-        assert leftEdge != null;
-        assert rightEdge != null;
-
-        return (this.leftEdge.GetCoord() >= s.GetRightCoord());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        boolean result = false;
-        if (obj != null && obj instanceof Signal) {
-            result = Objects.equals(this, obj);
-        }
+    // Helpers: -----------------------------------------
+    private Edge.Type LeftEdgeType(Signal.Type t) {
+        Edge.Type result;
+        result = (t == Signal.Type.HIGH)? Edge.Type.POS : Edge.Type.NEG;
         return result;
+    }
+
+    private Edge.Type RightEdgeType(Signal.Type t) {
+        Edge.Type result;
+        result = (t == Signal.Type.HIGH)? Edge.Type.NEG : Edge.Type.POS;
+        return result;
+    }
+
+    private void InsertEdge(Edge e) {
+        edges.add(e);
+        Collections.sort(edges);
+    }
+
+    private void InsertEdges(Edge left, Edge right) {
+        edges.add(left);
+        edges.add(right);
+        Collections.sort(edges);
+    }
+
+    // Deletiong is exclusive on both a and b
+    private void DeleteEdgesInRange(int a, int b) {
+        if (a > b) {
+            int c = 0;
+            c=a;
+            a=b;
+            b=c;
+        }
+        for (int i = 0; i < edges.size(); i++) {
+            int cur = edges.get(i).GetCoord();
+            if (a < cur && cur < b) {
+                edges.remove(i);
+                i--;
+            }
+        }
+    }
+
+    // Gets index element in edges with coord that matches target.
+    // If no such element is found, returns -1.
+    private int EdgesIndexOf(int target) {
+        int i;
+        for (i = 0; i < edges.size(); i++) {
+            int cur = edges.get(i).GetCoord();
+            if (cur == target) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
