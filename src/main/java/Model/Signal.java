@@ -45,7 +45,7 @@ public class Signal {
         pivot.SetType(LeftEdgeType(signalType));
         extendEdge.SetType(pivot.GetType().opposite());
 
-        if (OppositeTypes(pivot, LeftNeighbor(pivot))) {
+        if (!exists(pivot) && OppositeTypes(pivot, LeftNeighbor(pivot))) {
             InsertEdge(pivot);
         }
     }
@@ -71,7 +71,7 @@ public class Signal {
     }
 
     // Sets the pivot edge's type to the opposite type
-    public void Flip() {
+    public void SetDirectionLeft() {
         // Flip types for pivot and extendEdge
         pivot.SetType(pivot.GetType().opposite());
         extendEdge.SetType(extendEdge.GetType().opposite());
