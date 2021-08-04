@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 import java.util.ArrayList;
 
 class SignalTest {
+    // These members are used for all tests in this suite.
     private Signal signal;
     private Edge leftBound;
     private Edge rightBound;
@@ -37,7 +38,7 @@ class SignalTest {
         @DisplayName("One Signal")
         class oneSignal {
             @Nested
-            @DisplayName("Drag Right")
+            @DisplayName("Create by dragging right")
             class dragRight {
                 @DisplayName("Anchor")
                 @Test
@@ -53,25 +54,22 @@ class SignalTest {
                 }
 
                 @Nested
-                @DisplayName("Dragging")
+                @DisplayName("Drag on existing:")
                 class testDrag {
-                    int start;
-                    int end;
+                    int pointA = 50;
+                    int pointB = 100;
                     Edge edgeA;
                     Edge edgeB;
 
                     @BeforeEach
                     void createHighSignal() {
-                        start = 50;
-                        end = 100;
-
                         // Record the edges for testing
-                        edgeA = new Edge(Edge.Type.POS, start);
-                        edgeB = new Edge(Edge.Type.NEG, end);
+                        edgeA = new Edge(Edge.Type.POS, pointA);
+                        edgeB = new Edge(Edge.Type.NEG, pointB);
 
-                        signal.Anchor(Signal.Type.HIGH, start);
+                        signal.Anchor(Signal.Type.HIGH, pointA);
                         // Simulates dragging
-                        for (int i = start; i <= end; i++) {
+                        for (int i = pointA; i <= pointB; i++) {
                             signal.Extend(i);
                         }
                     }
@@ -89,8 +87,8 @@ class SignalTest {
                     @Test
                     void extendRight() {
                         // Drag again
-                        int newStart = 90;
-                        int newEnd = 150;
+                        int newStart = pointB - 10;
+                        int newEnd = pointB + 60;
                         signal.Anchor(Signal.Type.HIGH, newStart);
                         for (int i = newStart; i <= newEnd; i++) {
                             signal.Extend(i);
@@ -108,8 +106,8 @@ class SignalTest {
                     @Test
                     void extendLeft() {
                         // Drag again
-                        int newStart = 60;
-                        int newEnd = 10;
+                        int newStart = pointA + 10;
+                        int newEnd = leftBound.GetCoord() + 10;
                         signal.Anchor(Signal.Type.HIGH, newStart);
                         signal.SetDirectionLeft();
                         for (int i = newStart; i >= newEnd; i--) {
@@ -127,24 +125,20 @@ class SignalTest {
                     @DisplayName("Extend right, then left")
                     @Test
                     void extendBoth() {
-                        int newStart = 90;
-                        int newMid = 150;
-                        int newEnd = 10;
+                        int newStart = pointB - 10;
+                        int newMid = pointB + 50;
+                        int newEnd = leftBound.GetCoord() + 10;
 
                         signal.Anchor(Signal.Type.HIGH, newStart);
                         for (int i = newStart; i <= newMid; i++) {
                             signal.Extend(i);
                         }
 
-                        signal.PrintEdges();
-
                         signal.Anchor(Signal.Type.HIGH, newMid);
                         signal.SetDirectionLeft();
                         for (int i = newMid; i >= newEnd; i--) {
                             signal.Extend(i);
                         }
-
-                        signal.PrintEdges();
 
                         edgeA.SetCoord(newEnd);
                         edgeA.SetType(Edge.Type.POS);
@@ -157,15 +151,52 @@ class SignalTest {
                         assertArrayEquals(expected, actual);
                     }
 
+                    @Test
+                    @DisplayName("Shorten left side")
+                    void shortenLeft() {
+                        int start = pointA - 10;
+                        int end = pointB - 10;
+
+                        signal.Anchor(Signal.Type.LOW, start);
+                        for (int i = start; i <= end; i++) {
+                            signal.Extend(i);
+                        }
+
+                        edgeA.SetCoord(end);
+                        Edge[] expected = {leftBound, edgeA, edgeB, rightBound};
+                        Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+
+                        assertArrayEquals(expected, actual);
+                    }
+
+                    @Test
+                    @DisplayName("Shorten right side")
+                    void shortenRight() {
+                        int start = pointB + 10;
+                        int end = pointA + 10;
+
+                        signal.Anchor(Signal.Type.LOW, start);
+                        signal.SetDirectionLeft();
+                        for (int i = start; i >= end; i--) {
+                            signal.Extend(i);
+                        }
+
+                        edgeB.SetCoord(end);
+                        Edge[] expected = {leftBound, edgeA, edgeB, rightBound};
+                        Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+
+                        assertArrayEquals(expected, actual);
+                    }
+
                     @DisplayName("Delete right")
                     @Test
                     void deleteRight() {
                         // Simulate a right-click drag over the existing signal
-                        start = 30;
-                        end = 120;
+                        pointA = 30;
+                        pointB = 120;
 
-                        signal.Anchor(Signal.Type.LOW, start);
-                        for (int i = start; i <= end; i++) {
+                        signal.Anchor(Signal.Type.LOW, pointA);
+                        for (int i = pointA; i <= pointB; i++) {
                             signal.Extend(i);
                         }
 
@@ -178,12 +209,12 @@ class SignalTest {
                     @Test
                     void deleteLeft() {
                         // Simulate a right-click drag over the existing signal
-                        start = 120;
-                        end = 30;
+                        pointA = 120;
+                        pointB = 30;
 
-                        signal.Anchor(Signal.Type.LOW, start);
+                        signal.Anchor(Signal.Type.LOW, pointA);
                         signal.SetDirectionLeft();
-                        for (int i = start; i >= end; i--) {
+                        for (int i = pointA; i >= pointB; i--) {
                             signal.Extend(i);
                         }
 
@@ -195,7 +226,7 @@ class SignalTest {
             }
 
             @Nested
-            @DisplayName("Drag Left")
+            @DisplayName("Create by dragging left")
             class dragLeft {
                 @Test
                 @DisplayName("Anchor")
@@ -226,7 +257,7 @@ class SignalTest {
                 }
 
                 @Nested
-                @DisplayName("Dragging")
+                @DisplayName("Drag on existing:")
                 class testDrag {
                     int start;
                     int end;
@@ -302,7 +333,6 @@ class SignalTest {
                     @DisplayName("Extend left then right")
                     @Test
                     void extendBoth() {
-                        signal.PrintEdges();
                         int newStart = 90;
                         int newEnd = 150;
                         int newMid = 10;
@@ -314,16 +344,11 @@ class SignalTest {
                             signal.Extend(i);
                         }
 
-                        signal.PrintEdges();
-
                         // drag right
                         signal.Anchor(Signal.Type.HIGH, newMid);
-//                        signal.Flip();
                         for (int i = newMid; i <= newEnd; i++) {
                             signal.Extend(i);
                         }
-
-                        signal.PrintEdges();
 
                         edgeA.SetCoord(newMid);
                         edgeA.SetType(Edge.Type.POS);
@@ -331,6 +356,46 @@ class SignalTest {
                         edgeB.SetType(Edge.Type.NEG);
 
                         Edge[] expected = {leftBound, edgeA, edgeB, rightBound};
+                        Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+
+                        assertArrayEquals(expected, actual);
+                    }
+
+                    @Test
+                    @DisplayName("Shorten left side")
+                    void shortenLeft() {
+                        int start = edgeB.GetCoord() - 10;
+                        int end = edgeA.GetCoord() - 10;
+
+                        signal.PrintEdges();
+
+                        signal.Anchor(Signal.Type.LOW, start);
+                        for (int i = start; i <= end; i++) {
+                            signal.Extend(i);
+                        }
+
+                        signal.PrintEdges();
+                        edgeB.SetCoord(end);
+                        Edge[] expected = {leftBound, edgeB, edgeA, rightBound};
+                        Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+
+                        assertArrayEquals(expected, actual);
+                    }
+
+                    @Test
+                    @DisplayName("Shorten right side")
+                    void shortenRight() {
+                        int start = edgeA.GetCoord() + 10;
+                        int end = edgeB.GetCoord() + 10;
+
+                        signal.Anchor(Signal.Type.LOW, start);
+                        signal.SetDirectionLeft();
+                        for (int i = start; i >= end; i--) {
+                            signal.Extend(i);
+                        }
+
+                        edgeA.SetCoord(end);
+                        Edge[] expected = {leftBound, edgeB, edgeA, rightBound};
                         Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
 
                         assertArrayEquals(expected, actual);
@@ -375,23 +440,111 @@ class SignalTest {
         }
 
         @Nested
-        @DisplayName("Two signals")
-        class TwoSignals {
-            int start1;
-            int end1;
+        @DisplayName("Two Signals")
+        class twoSignals {
+            int pointA = 50;
+            int pointB = 100;
+            Edge edgeA;
+            Edge edgeB;
 
-            int start2;
-            int end2;
+            int pointC = 150;
+            int pointD = 200;
+            Edge edgeC;
+            Edge edgeD;
 
-            @BeforeAll
+            @BeforeEach
             void initSignals() {
+                edgeA = new Edge(Edge.Type.POS, pointA);
+                edgeB = new Edge(Edge.Type.NEG, pointB);
+                edgeC = new Edge(Edge.Type.POS, pointC);
+                edgeD = new Edge(Edge.Type.NEG, pointD);
 
+                signal.Anchor(Signal.Type.HIGH, pointA);
+                for (int i = pointA; i <= pointB; i++) {
+                    signal.Extend(i);
+                }
+
+                signal.Anchor(Signal.Type.HIGH, pointC);
+                for (int i = pointC; i <= pointD; i++) {
+                    signal.Extend(i);
+                }
             }
 
             @Test
-            @DisplayName("Merge high signals")
-            void mergeHighSignals() {
+            @DisplayName("Signals created properly")
+            void testCreation() {
+                Edge[] expected = {leftBound, edgeA, edgeB, edgeC, edgeD, rightBound};
+                Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
 
+                assertArrayEquals(expected, actual);
+            }
+
+            @Test
+            @DisplayName("Merge right")
+            void mergeRight() {
+                int start = pointB - 10;
+                int end = pointC + 10;
+
+                signal.Anchor(Signal.Type.HIGH, start);
+                for (int i = start; i <= end; i++) {
+                    signal.Extend(i);
+                }
+
+                Edge[] expected = {leftBound, edgeA, edgeD, rightBound};
+                Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+
+                assertArrayEquals(expected, actual);
+            }
+
+            @Test
+            @DisplayName("Merge left")
+            void mergeLeft() {
+                int start = pointC + 10;
+                int end = pointB - 10;
+
+                signal.Anchor(Signal.Type.HIGH, start);
+                signal.SetDirectionLeft();
+                for (int i = start; i >= end; i--) {
+                    signal.Extend(i);
+                }
+
+                Edge[] expected = {leftBound, edgeA, edgeD, rightBound};
+                Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+
+                assertArrayEquals(expected, actual);
+            }
+
+            @Test
+            @DisplayName("Clear right")
+            void clearRight() {
+                int start = pointA - 10;
+                int end =  pointD + 10;
+
+                signal.Anchor(Signal.Type.LOW, start);
+                for (int i = start; i <= end; i++) {
+                    signal.Extend(i);
+                }
+
+                Edge[] expected = {leftBound, rightBound};
+                Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+                assertArrayEquals(expected, actual);
+            }
+
+            @Test
+            @DisplayName("Clear left")
+            void clearLeft() {
+                int start = pointD + 10;
+                int end =  pointA - 10;
+
+                signal.Anchor(Signal.Type.LOW, start);
+                signal.SetDirectionLeft();
+                for (int i = start; i >= end; i--) {
+                    signal.Extend(i);
+                }
+
+                Edge[] expected = {leftBound, rightBound};
+                Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+                assertArrayEquals(expected, actual);
             }
         }
     }
