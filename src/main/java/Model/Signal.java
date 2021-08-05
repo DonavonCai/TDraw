@@ -53,6 +53,15 @@ public class Signal {
     // Extend the signal from pivot to coord.
     // If any edges are in-between pivot and coord, delete them.
     public void Extend(int coord) {
+        if (coord <= leftBound) {
+            DeleteEdgesInRange(leftBound, coord);
+            return;
+        }
+        else if (coord >= rightBound) {
+            DeleteEdgesInRange(coord, rightBound);
+            return;
+        }
+
         DeleteEdgesInRange(pivot.GetCoord(), coord);
         extendEdge.SetCoord(coord);
 

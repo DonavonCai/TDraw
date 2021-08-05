@@ -32,6 +32,51 @@ class SignalTest {
     }
 
     @Nested
+    @DisplayName("Bounds")
+    class testBounds {
+        @Test
+        @DisplayName("Drag past left bound")
+        void testLeft() {
+            int start = leftBound.GetCoord() + 10;
+            int end = leftBound.GetCoord() - 10;
+
+            signal.Anchor(Signal.Type.LOW, start);
+
+            signal.SetDirectionLeft();
+            for (int i = start; i >= end; i--) {
+                signal.Extend(i);
+            }
+
+            Edge[] expected = {leftBound, rightBound};
+            Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+            assertArrayEquals(expected, actual);
+        }
+
+        @Test
+        @DisplayName("Drag past right bound")
+        void testRight() {
+            int start = rightBound.GetCoord() - 10;
+            int end = rightBound.GetCoord() + 10;
+
+            signal.Anchor(Signal.Type.LOW, start);
+
+            for (int i = start; i <= end; i++) {
+                signal.Extend(i);
+            }
+
+            Edge[] expected = {leftBound, rightBound};
+            Edge[] actual = signal.GetEdges().toArray(new Edge[0]);
+            assertArrayEquals(expected, actual);
+        }
+
+        @Test
+        @DisplayName("Drag past both")
+        void testBoth() {
+            assertEquals(0, 1);
+        }
+    }
+
+    @Nested
     @DisplayName("Creating high signals")
     class highSignal {
         @Nested
