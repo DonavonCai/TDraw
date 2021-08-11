@@ -1,17 +1,23 @@
 package View;
 
 import Controller.TDrawController;
+import Model.DiagramModel;
+import Model.Signal;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import static java.lang.System.exit;
+import java.util.ArrayList;
 
+import static java.lang.System.exit;
+// todo: move this stuff to main()?
 public class View {
     Stage stage;
     FXMLLoader loader;
+
+//    private ArrayList<SignalView> signalViews;
 
     public View(Stage s, FXMLLoader f) {
         stage = s;
@@ -49,9 +55,14 @@ public class View {
         }
     }
 
+    public void AddSignal() {
+//        signalViews.add(new SignalView());
+    }
+
     public void StartController() {
         TDrawController controller = (TDrawController)loader.getController();
-        controller.PassViewToDiagram(this);
+        controller.SetModel(new DiagramModel());
+//        controller.PassViewToDiagram(this);
 //        controller.CreateDiagram(stage);
     }
 }

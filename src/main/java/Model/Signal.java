@@ -1,11 +1,14 @@
 package Model;
 
+import View.SignalView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class Signal {
     public enum Type {HIGH, LOW};
 
+    private SignalView view;
     private Edge pivot;
     private Edge extendEdge;
     private int leftBound;
@@ -16,14 +19,26 @@ public class Signal {
     public ArrayList<Edge> GetEdges() {
         return edges;
     }
+    public void SetView(SignalView v) { view = v; }
+    public void SetEdges(ArrayList<Edge> arr) { edges = arr; }
 
     // Constructors: ----------------------------------
     public Signal() {
         edges = new ArrayList<Edge>();
+        view = new SignalView();
     }
 
     public Signal(ArrayList<Edge> arr) {
         edges = arr;
+    }
+
+    public Signal(SignalView v) {
+        view = v;
+    }
+
+    public Signal(ArrayList<Edge> arr, SignalView v) {
+        edges = arr;
+        view = v;
     }
 
     // Interface: -------------------------------------

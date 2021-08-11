@@ -1,38 +1,45 @@
 package Model;
 
 import View.View;
+import View.SignalView;
+
+import java.util.ArrayList;
 
 // This class provides the interface that the controller will use to update the model.
 
+//todo: array of contexts for signals. put the array in View or this class?
 public class DiagramModel {
-    private View view;
-//    private SignalTree tree;
+    // Constants: ----------------------------------------------------
+    int MAX_SIGS = 10;
 
-    public void SetView(View v) {
-        view = v;
-    }
+    // Members: ------------------------------------------------------
+    int numSigs;
+    private ArrayList<Signal> signalModels;
 
-//    public void SetTree(SignalTree t) {
-//        tree = t;
-//    }
+    // Setters and Getters: ------------------------------------------
+    public int GetNumSigs() { return numSigs; }
 
+    // Interface: ----------------------------------------------------
     public DiagramModel() {
-
+        numSigs = 0;
+        signalModels = new ArrayList<Signal>();
     }
 
-    public void CreateSignal(int c) {
-//        tree.CreateSignal(c);
+    public void AddSignal(SignalView signalView) {
+        if (numSigs > MAX_SIGS)
+            numSigs++;
+
+        Signal newSignal = new Signal();
+        newSignal.SetView(signalView);
+        signalModels.add(newSignal);
+    }
+
+    public void RemoveSignal(int i) {
+        numSigs--;
+        signalModels.remove(i);
     }
 
     public void ExtendSignal(int c) {
-
-    }
-
-    public void FinishSignal() {
-
-    }
-
-    public void NotifyView() {
 
     }
 }
