@@ -1,11 +1,13 @@
 package View;
 
+import TimingDiagram.DSignal.Edge.Edge;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 public class SignalView {
     private double canvasWidth = 700;
@@ -26,6 +28,8 @@ public class SignalView {
     // Accessors: --------------------------------------------
     public HBox GetDiagram() { return diagram; }
 
+    public Pane GetSignalPane() { return signalPane; }
+
     // Interface: --------------------------------------------
     public SignalView() {
         // layout
@@ -37,6 +41,28 @@ public class SignalView {
 
         SetStyle();
         SetFormat();
+        Initialize("low");
+    }
+
+    public void Initialize(String type) {
+        int height = 0;
+        if (type == "high") {
+            height = 0;
+        }
+        else if (type == "low") {
+            height = SIGNAL_HEIGHT;
+        }
+        else {
+            System.out.println("Error: string not recognized");
+        }
+
+        gc.beginPath();
+        gc.setLineWidth(LINE_WIDTH);
+        gc.setFill(Color.BLACK);
+        gc.moveTo(0, height);
+        gc.lineTo(canvasWidth, height);
+        gc.stroke();
+        gc.stroke(); // second stroke makes it more solid
     }
 
     // Helpers: ----------------------------------------------

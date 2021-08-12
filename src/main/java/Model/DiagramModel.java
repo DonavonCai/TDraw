@@ -25,13 +25,11 @@ public class DiagramModel {
         signalModels = new ArrayList<Signal>();
     }
 
-    public void AddSignal(SignalView signalView) {
+    public void AddSignal(Signal signalModel) {
         if (numSigs > MAX_SIGS)
             numSigs++;
 
-        Signal newSignal = new Signal();
-        newSignal.SetView(signalView);
-        signalModels.add(newSignal);
+        signalModels.add(signalModel);
     }
 
     public void RemoveSignal(int i) {

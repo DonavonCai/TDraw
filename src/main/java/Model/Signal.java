@@ -42,7 +42,7 @@ public class Signal {
     }
 
     // Interface: -------------------------------------
-    public void Init(Edge left, Edge right) {
+    public void Initialize(Edge left, Edge right) {
         assert edges != null;
         assert edges.size() == 0;
         leftBound = left.GetCoord();

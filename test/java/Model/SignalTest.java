@@ -17,7 +17,7 @@ class SignalTest {
 
         leftBound = new Edge(Edge.Type.NEG, 0);
         rightBound = new Edge(Edge.Type.POS, 1000);
-        signal.Init(leftBound, rightBound);
+        signal.Initialize(leftBound, rightBound);
     }
 
     @DisplayName("Init")

@@ -1,14 +1,17 @@
 package Controller;
 
 import Model.DiagramModel;
-import TimingDiagram.DSignal.DSignal;
+import Model.Signal;
 import View.SignalView;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 public class SignalController {
@@ -37,20 +40,26 @@ public class SignalController {
 
     @FXML
     public void AddSignal() {
-        // Notify model, and give it a view
+        // Create a model and give it a view
+        Signal signalModel = new Signal();
         SignalView signalView = new SignalView();
-        model.AddSignal(signalView);
+        signalModel.SetView(signalView);
+
+        model.AddSignal(signalModel);
 
         // add button
         Button deleteSignal = createDeleteButton();
         deleteSignal.setUserData(model.GetNumSigs());
         buttonBox.getChildren().add(deleteSignal);
 
+        // add the diagram
         HBox signalContainer = new HBox((signalView.GetDiagram()));
         signalContainer.setAlignment(Pos.CENTER_LEFT);
+        signalContainer.setUserData(model.GetNumSigs());
         signalBox.getChildren().add(signalContainer);
 
-        signalContainer.setUserData(model.GetNumSigs());
+        // Create event handlers for getting user input on the signal pane
+        ActivateEventHandlers(signalView.GetSignalPane());
     }
 
     // Helpers: ---------------------------------------------------------
@@ -60,12 +69,12 @@ public class SignalController {
         b.setOnMousePressed(e-> b.setStyle(PRESSED_BUTTON_STYLE));
         b.setOnMouseReleased(e-> b.setStyle(IDLE_BUTTON_STYLE));
         b.setOnAction((ActionEvent event) -> {
-            remove_signal(b);
+            removeSignal(b);
         });
         return b;
     }
 
-    protected void remove_signal(Button b) {
+    protected void removeSignal(Button b) {
         // Remove signal from model
         int i = (int)b.getUserData();
         model.RemoveSignal(i);
@@ -83,5 +92,32 @@ public class SignalController {
             }
         }
         return null;
+    }
+
+    private void ActivateEventHandlers(Pane signalPane) {
+        signalPane.addEventHandler(MouseEvent.MOUSE_PRESSED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+
+                    }
+                }
+        );
+        signalPane.addEventHandler(MouseEvent.MOUSE_DRAGGED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+
+                    }
+                }
+        );
+        signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+
+                    }
+                }
+        );
     }
 }
