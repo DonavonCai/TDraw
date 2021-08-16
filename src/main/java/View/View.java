@@ -2,14 +2,11 @@ package View;
 
 import Controller.TDrawController;
 import Model.DiagramModel;
-import Model.Signal;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
 
 import static java.lang.System.exit;
 // todo: move this stuff to main()?

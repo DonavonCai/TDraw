@@ -1,8 +1,5 @@
 package Model;
 
-import View.View;
-import View.SignalView;
-
 import java.util.ArrayList;
 
 // This class provides the interface that the controller will use to update the model.

@@ -52,6 +52,16 @@ public class Signal {
         Collections.sort(edges);
     }
 
+    public void Initialize(int left, int right) {
+        assert edges != null;
+        assert edges.size() == 0;
+        leftBound = left;
+        rightBound = right;
+        edges.add(new Edge(left, Edge.Type.NEG));
+        edges.add(new Edge(right, Edge.Type.POS));
+        Collections.sort(edges);
+    }
+
 
     public void Anchor(Signal.Type signalType, int c) {
         pivot = new Edge(c);

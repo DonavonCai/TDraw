@@ -1,17 +1,15 @@
 package Controller;
 
+import Controller.Helper.MouseEventHandler;
 import Model.DiagramModel;
 import Model.Signal;
 import View.SignalView;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 public class SignalController {
@@ -21,6 +19,9 @@ public class SignalController {
 
     // Members: ------------------------------------------------------
     DiagramModel model;
+    MouseEventHandler eventHandlerCreator;
+    private int leftBound;
+    private int rightBound;
 
     // UI components: ---------------------------------------
     @FXML
@@ -33,7 +34,10 @@ public class SignalController {
     // Functions used in FXML: ---------------------------------------
     @FXML
     public void initialize() {
+        leftBound = 0;
+        rightBound = 700;
         model = new DiagramModel();
+        eventHandlerCreator = new MouseEventHandler();
         signalWrapper.setFillHeight(false); // wrapper will not resize children
         AddSignal();
     }
@@ -59,7 +63,8 @@ public class SignalController {
         signalBox.getChildren().add(signalContainer);
 
         // Create event handlers for getting user input on the signal pane
-        ActivateEventHandlers(signalView.GetSignalPane());
+        eventHandlerCreator.SetBounds(leftBound, rightBound);
+        eventHandlerCreator.CreateEventHandlers(signalModel, signalView);
     }
 
     // Helpers: ---------------------------------------------------------
@@ -92,32 +97,5 @@ public class SignalController {
             }
         }
         return null;
-    }
-
-    private void ActivateEventHandlers(Pane signalPane) {
-        signalPane.addEventHandler(MouseEvent.MOUSE_PRESSED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-
-                    }
-                }
-        );
-        signalPane.addEventHandler(MouseEvent.MOUSE_DRAGGED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-
-                    }
-                }
-        );
-        signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-
-                    }
-                }
-        );
     }
 }
