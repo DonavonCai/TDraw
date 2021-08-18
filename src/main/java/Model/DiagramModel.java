@@ -33,8 +33,4 @@ public class DiagramModel {
         numSigs--;
         signalModels.remove(i);
     }
-
-    public void ExtendSignal(int c) {
-
-    }
 }

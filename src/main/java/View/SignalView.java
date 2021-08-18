@@ -1,6 +1,6 @@
 package View;
 
-import TimingDiagram.DSignal.Edge.Edge;
+import Model.Edge;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -8,6 +8,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
 
 public class SignalView {
     private double canvasWidth = 700;
@@ -65,7 +67,74 @@ public class SignalView {
         gc.stroke(); // second stroke makes it more solid
     }
 
+//    public void DrawEdges(ArrayList<Edge> edges) {
+//        // start from i = 1 to ignore
+//        for (int i = 1; i < edges.size() - 1; i++) {
+//            Edge a = edges.get(i);
+//            Edge b = edges.get(i + 1);
+//            // todo: finish
+//        }
+//    }
+
+    public void DrawSingle(Edge a) {
+        int coord = a.GetCoord();
+        gc.beginPath();
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(LINE_WIDTH);
+        gc.moveTo(coord, SIGNAL_HEIGHT);
+        gc.lineTo(coord, 0);
+        gc.stroke();
+    }
+
+    public void DrawPair(Edge a, boolean drawA, Edge b, boolean drawB) {
+        if (a.GetCoord() > b.GetCoord()) {
+            Edge temp = a;
+            a = b;
+            b = temp;
+
+            boolean tempBool = drawA;
+            drawA = drawB;
+            drawB = tempBool;
+        }
+
+        if (drawA)
+            DrawSingle(a);
+
+        if (drawB)
+            DrawSingle(b);
+
+        DrawHorizontal(a, b);
+        EraseBetween(a, b);
+    }
+
     // Helpers: ----------------------------------------------
+    private void DrawHorizontal(Edge a, Edge b) {
+        // draw horizontal line
+        gc.beginPath();
+        if (a.GetType() == Edge.Type.POS) {
+            gc.moveTo(a.GetCoord(), 0);
+            gc.lineTo(b.GetCoord(), 0);
+        }
+        else if (a.GetType() == Edge.Type.NEG) {
+            gc.moveTo(a.GetCoord(), SIGNAL_HEIGHT);
+            gc.lineTo(b.GetCoord(), SIGNAL_HEIGHT);
+        }
+        gc.stroke();
+    }
+
+    private void EraseBetween(Edge a, Edge b) {
+        int rect_x;
+        int rect_y = (a.GetType() == Edge.Type.POS)? LINE_WIDTH - 1 : 0;
+        int rect_width;
+        int rect_height = (a.GetType() == Edge.Type.POS)? SIGNAL_HEIGHT : SIGNAL_HEIGHT - LINE_WIDTH + 1;
+        gc.setFill(Color.WHITE);
+
+        rect_x = a.GetCoord();
+        rect_width = b.GetCoord() - a.GetCoord();
+
+        gc.fillRect(rect_x, rect_y, rect_width, rect_height);
+    }
+
     private void SetStyle() {
         double canvasWidth = 700;
         int height = SIGNAL_HEIGHT;

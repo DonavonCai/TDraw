@@ -10,7 +10,9 @@ public class Signal {
 
     private SignalView view;
     private Edge pivot;
+    private boolean pivotVisible;
     private Edge extendEdge;
+    private boolean extendVisible;
     private int leftBound;
     private int rightBound;
     private ArrayList<Edge> edges;
@@ -64,6 +66,7 @@ public class Signal {
 
 
     public void Anchor(Signal.Type signalType, int c) {
+        pivotVisible = false;
         pivot = new Edge(c);
         extendEdge = new Edge(Integer.MIN_VALUE);
         // Assume we will drag right
@@ -71,7 +74,9 @@ public class Signal {
         extendEdge.SetType(pivot.GetType().opposite());
 
         if (!exists(pivot) && OppositeTypes(pivot, LeftNeighbor(pivot))) {
+            pivotVisible = true;
             InsertEdge(pivot);
+            view.DrawSingle(pivot);
         }
     }
 
@@ -100,8 +105,13 @@ public class Signal {
         Edge compareRight = RightNeighbor(extendEdge);
 
         if (OppositeTypes(compareLeft, extendEdge) && OppositeTypes(extendEdge, compareRight)) {
+            extendVisible = true;
             ExtendEdgeTo(coord);
         }
+        else {
+            extendVisible = false;
+        }
+        view.DrawPair(pivot, pivotVisible, extendEdge, extendVisible);
     }
 
     // Sets the pivot edge's type to the opposite type
