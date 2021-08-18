@@ -103,7 +103,9 @@ public class SignalView {
         if (drawB)
             DrawSingle(b);
 
-        DrawHorizontal(a, b);
+        if (drawA || drawB)
+            DrawHorizontal(a, b);
+
         EraseBetween(a, b);
     }
 

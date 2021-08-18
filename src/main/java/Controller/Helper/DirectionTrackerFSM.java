@@ -86,6 +86,7 @@ public class DirectionTrackerFSM {
                 break;
             case FLIP_LEFT:
                 direction = Dir.LEFT;
+//                System.out.println("flip left");
                 directionChange = true;
                 break;
             case FLIP_RIGHT:

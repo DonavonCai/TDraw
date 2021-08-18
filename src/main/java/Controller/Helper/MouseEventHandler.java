@@ -10,8 +10,6 @@ public class MouseEventHandler {
     private int leftBound;
     private int rightBound;
 
-    private boolean firstTick = true;
-
     DirectionTrackerFSM directionTracker;
 
     public MouseEventHandler() {
@@ -32,7 +30,6 @@ public class MouseEventHandler {
             new javafx.event.EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    firstTick = true;
                     directionTracker.Reset();
 
                     Anchor(signalModel, event);
@@ -49,16 +46,19 @@ public class MouseEventHandler {
 
                     if (directionTracker.ChangedDirection()) {
                         Anchor(signalModel, event);
+                        if (directionTracker.movingLeft())
+                            signalModel.SetDirectionLeft();
                     }
 
                     if (directionTracker.movingRight()) {
                         signalModel.Extend(coord);
                     }
                     else if (directionTracker.movingLeft()) {
-                        if (firstTick) {
-                            signalModel.SetDirectionLeft();
-                            firstTick = false;
-                        }
+                        if (event.getButton() == MouseButton.PRIMARY)
+                            signalModel.SetDirectionLeft(Signal.Type.HIGH);
+                        else if (event.getButton() == MouseButton.SECONDARY)
+                            signalModel.SetDirectionLeft(Signal.Type.LOW);
+
                         signalModel.Extend(coord);
                     }
                 }

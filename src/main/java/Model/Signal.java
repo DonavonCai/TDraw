@@ -115,10 +115,28 @@ public class Signal {
     }
 
     // Sets the pivot edge's type to the opposite type
+    public void SetDirectionLeft(Signal.Type signalType) {
+        // Flip types for pivot and extendEdge
+        extendEdge.SetType(LeftEdgeType(signalType));
+        pivot.SetType(extendEdge.GetType().opposite());
+
+        // Copy those changes to edges arr if present
+        int pivotIdx = IndexOfCoord(pivot.GetCoord());
+        if (pivotIdx > -1) {
+            edges.remove(pivotIdx);
+            edges.add(pivot);
+        }
+        int extIdx = IndexOfCoord(extendEdge.GetCoord());
+        if (extIdx > -1) {
+            edges.remove(extIdx);
+            edges.add(extendEdge);
+        }
+        Collections.sort(edges);
+    }
+
     public void SetDirectionLeft() {
         // Flip types for pivot and extendEdge
         pivot.SetType(pivot.GetType().opposite());
-        extendEdge.SetType(extendEdge.GetType().opposite());
 
         // Copy those changes to edges arr if present
         int pivotIdx = IndexOfCoord(pivot.GetCoord());
