@@ -9,17 +9,3 @@ Mac OS - Download TDraw.jar and run. It is possible that you may need to run fro
 
 # How to use
 Simply left click to draw a high signal, right click to draw a low signal. When you are done, File > Export as PDF and choose a directory and the program will save your diagram as a PNG file.
-
-# Documentation
-
-## Classes:
-
-### TDraw:
-
-This class launches the application, and is the primary class responsible for the layout of the page. It contains a menu bar and some buttons. It also contains a Scene 'diagram' which contains a number of DSignals which can be dynamically added and removed.
-
-### DSignal:
-
-The DSignal class holds all information necessary for an individual signal. This class contains handlers for mouse clicking, dragging, and releasing.
-
-## UML Diagram:
