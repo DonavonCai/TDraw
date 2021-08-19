@@ -23,14 +23,17 @@ public class DiagramModel {
     }
 
     public void AddSignal(Signal signalModel) {
-        if (numSigs > MAX_SIGS)
+        if (numSigs < MAX_SIGS) {
             numSigs++;
-
-        signalModels.add(signalModel);
+            signalModels.add(signalModel);
+        }
     }
 
+    // fixme: removes in wrong order
     public void RemoveSignal(int i) {
-        numSigs--;
-        signalModels.remove(i);
+        if (numSigs > 0) {
+            numSigs--;
+            signalModels.remove(i);
+        }
     }
 }

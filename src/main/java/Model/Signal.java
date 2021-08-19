@@ -76,7 +76,9 @@ public class Signal {
         if (!exists(pivot) && OppositeTypes(pivot, LeftNeighbor(pivot))) {
             pivotVisible = true;
             InsertEdge(pivot);
-            view.DrawSingle(pivot);
+
+            if (view != null)
+                view.DrawSingle(pivot);
         }
     }
 
@@ -111,7 +113,9 @@ public class Signal {
         else {
             extendVisible = false;
         }
-        view.DrawPair(pivot, pivotVisible, extendEdge, extendVisible);
+
+        if (view != null)
+            view.DrawPair(pivot, pivotVisible, extendEdge, extendVisible);
     }
 
     // Sets the pivot edge's type to the opposite type

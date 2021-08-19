@@ -64,14 +64,14 @@ public class MouseEventHandler {
                 }
             }
         );
-        signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
-            new javafx.event.EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    signalModel.PrintEdges();
-                }
-            }
-        );
+//        signalPane.addEventHandler(MouseEvent.MOUSE_RELEASED,
+//            new javafx.event.EventHandler<MouseEvent>() {
+//                @Override
+//                public void handle(MouseEvent event) {
+//                    signalModel.PrintEdges();
+//                }
+//            }
+//        );
     }
 
     private void Anchor(Signal signalModel, MouseEvent event) {

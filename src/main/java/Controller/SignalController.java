@@ -61,6 +61,7 @@ public class SignalController {
         signalContainer.setAlignment(Pos.CENTER_LEFT);
         signalContainer.setUserData(model.GetNumSigs());
         signalBox.getChildren().add(signalContainer);
+        signalBox.setUserData(deleteSignal.getUserData());
 
         // Create event handlers for getting user input on the signal pane
         eventHandlerCreator.SetBounds(leftBound, rightBound);

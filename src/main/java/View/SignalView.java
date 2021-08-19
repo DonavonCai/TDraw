@@ -67,15 +67,6 @@ public class SignalView {
         gc.stroke(); // second stroke makes it more solid
     }
 
-//    public void DrawEdges(ArrayList<Edge> edges) {
-//        // start from i = 1 to ignore
-//        for (int i = 1; i < edges.size() - 1; i++) {
-//            Edge a = edges.get(i);
-//            Edge b = edges.get(i + 1);
-//            // todo: finish
-//        }
-//    }
-
     public void DrawSingle(Edge a) {
         int coord = a.GetCoord();
         gc.beginPath();
