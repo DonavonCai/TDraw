@@ -10,12 +10,12 @@
  and are referenced as <name>ViewModel in injected @FXML fields -->
 <Group xmlns:fx="http://javafx.com/fxml" fx:id="root" fx:controller="Controller.TDrawController">
     <VBox fx:id="page">
-<!--        <MenuBar prefWidth="${page.width}" style="-fx-background-color: white; -fx-border-color: transparent transparent gray transparent">-->
-<!--            <menus>-->
-<!--                <fx:include fx:id="fileMenu" source="FileMenu.fxml"> </fx:include>-->
+        <MenuBar prefWidth="${page.width}" style="-fx-background-color: white; -fx-border-color: transparent transparent gray transparent">
+            <menus>
+                <fx:include fx:id="fileMenu" source="FileMenu.fxml"> </fx:include>
 <!--                <fx:include fx:id="editMenu" source="EditMenu.fxml"> </fx:include>-->
-<!--            </menus>-->
-<!--        </MenuBar>-->
+            </menus>
+        </MenuBar>
         <VBox fx:id="buttons" minWidth="100" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-spacing: 24">
             <Button text="add signal" onMouseClicked="#AddSignal"> </Button>
         </VBox>

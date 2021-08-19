@@ -1,6 +1,7 @@
 package Controller;
 
 import Controller.Helper.MouseEventHandler;
+import Controller.MenuController.FileMenuController;
 import Model.DiagramModel;
 import Model.Signal;
 import View.SignalView;
@@ -23,13 +24,18 @@ public class SignalController {
     private int leftBound;
     private int rightBound;
 
-    // UI components: ---------------------------------------
+    // UI components: -----------------------------------------------
     @FXML
     private HBox signalWrapper;
     @FXML
     private VBox buttonBox;
     @FXML
     private VBox signalBox;
+
+    // Setters and getters: ------------------------------------------
+    public VBox GetSignalBox() {
+        return signalBox;
+    }
 
     // Functions used in FXML: ---------------------------------------
     @FXML
@@ -81,14 +87,19 @@ public class SignalController {
     }
 
     protected void removeSignal(Button b) {
-        // Remove signal from model
-        int i = (int)b.getUserData();
-        model.RemoveSignal(i);
+        int userData = (int)b.getUserData();
+        int index;
+
+        // Find out which to remove
+        HBox containerToRemove = (HBox)getByUserData(signalBox, userData);
+        index = signalBox.getChildren().indexOf(containerToRemove);
 
         // Remove signal from view
-        HBox container_to_remove = (HBox)getByUserData(signalBox, i);
-        signalBox.getChildren().remove(container_to_remove);
+        signalBox.getChildren().remove(containerToRemove);
         buttonBox.getChildren().remove(b);
+
+        // Remove from model
+        model.RemoveSignal(index);
     }
 
     private Node getByUserData(VBox parent, Object data) {

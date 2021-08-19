@@ -31,9 +31,8 @@ public class DiagramModel {
 
     // fixme: removes in wrong order
     public void RemoveSignal(int i) {
-        if (numSigs > 0) {
-            numSigs--;
-            signalModels.remove(i);
-        }
+        // fixme: change i to be index by userData
+        signalModels.remove(i);
+        numSigs--;
     }
 }
